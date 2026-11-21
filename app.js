@@ -1,83 +1,8 @@
 (() => {
   "use strict";
-    /* --- SISTEM LOGIN & KEAMANAN SESI --- */
+
   const AUTH_KEY = "sanisStudio_auth_v1";
   const SESSION_KEY = "sanisStudio_session_v1";
-
-  async function hashText(str) {
-    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-  }
-
-  async function getAuthCreds() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
-      if (saved && saved.user && saved.passHash) return saved;
-    } catch (_) {}
-    return { user: "saniscoro", passHash: await hashText("5758") };
-  }
-
-  function unlockStudio() {
-    document.getElementById("loginScreen").classList.add("hidden");
-    document.getElementById("appShell").classList.remove("app-locked");
-  }
-
-  function lockStudio() {
-    sessionStorage.removeItem(SESSION_KEY);
-    document.getElementById("loginPass").value = "";
-    document.getElementById("loginError").textContent = "";
-    document.getElementById("appShell").classList.add("app-locked");
-    document.getElementById("loginScreen").classList.remove("hidden");
-  }
-
-  (async function initAuth() {
-    const creds = await getAuthCreds();
-    document.getElementById("newAuthUser").value = creds.user;
-
-    if (sessionStorage.getItem(SESSION_KEY) === "1") {
-      unlockStudio();
-    }
-
-    document.getElementById("btnTogglePass").onclick = () => {
-      const inp = document.getElementById("loginPass");
-      inp.type = inp.type === "password" ? "text" : "password";
-    };
-
-    document.getElementById("loginForm").onsubmit = async e => {
-      e.preventDefault();
-      const u = document.getElementById("loginUser").value.trim().toLowerCase();
-      const p = document.getElementById("loginPass").value;
-      const errBox = document.getElementById("loginError");
-      const current = await getAuthCreds();
-
-      if (u === current.user.toLowerCase() && (await hashText(p)) === current.passHash) {
-        sessionStorage.setItem(SESSION_KEY, "1");
-        errBox.textContent = "";
-        unlockStudio();
-        showToast(`Selamat datang, ${current.user}!`);
-      } else {
-        errBox.textContent = "Username atau Password/PIN salah.";
-      }
-    };
-
-    document.getElementById("btnLogout").onclick = () => {
-      lockStudio();
-      showToast("Sesi dikunci.");
-    };
-
-    document.getElementById("btnSaveAuth").onclick = async () => {
-      const newU = document.getElementById("newAuthUser").value.trim();
-      const newP = document.getElementById("newAuthPass").value;
-      if (newU.length < 3) return showToast("Username minimal 3 karakter");
-      if (newP.length < 4) return showToast("Password/PIN minimal 4 karakter");
-      const passHash = await hashText(newP);
-      localStorage.setItem(AUTH_KEY, JSON.stringify({ user: newU, passHash }));
-      document.getElementById("newAuthPass").value = "";
-      showToast("Username & Password login diperbarui!");
-    };
-  })();
-
-
   const STORAGE_KEY = "sanisStudio_modular_v1";
   const SAFE_MIME = /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=]+$/i;
   const imgCache = new Map();
@@ -156,6 +81,84 @@
   let rafPending = false;
   let saveTimer = null;
 
+  /* --- SISTEM LOGIN --- */
+  async function hashText(str) {
+    if (window.crypto && window.crypto.subtle) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+    return "plain_" + str;
+  }
+
+  async function getAuthCreds() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
+      if (saved && saved.user && saved.passHash) return saved;
+    } catch (_) {}
+    return { user: "saniscoro", passHash: await hashText("5758") };
+  }
+
+  function unlockStudio() {
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("appShell").classList.remove("app-locked");
+    requestRender();
+  }
+
+  function lockStudio() {
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById("loginPass").value = "";
+    document.getElementById("loginError").textContent = "";
+    document.getElementById("appShell").classList.add("app-locked");
+    document.getElementById("loginScreen").classList.remove("hidden");
+  }
+
+  async function initAuth() {
+    const creds = await getAuthCreds();
+    document.getElementById("newAuthUser").value = creds.user;
+
+    if (sessionStorage.getItem(SESSION_KEY) === "1") {
+      unlockStudio();
+    }
+
+    document.getElementById("btnTogglePass").onclick = () => {
+      const inp = document.getElementById("loginPass");
+      inp.type = inp.type === "password" ? "text" : "password";
+    };
+
+    document.getElementById("loginForm").onsubmit = async e => {
+      e.preventDefault();
+      const u = document.getElementById("loginUser").value.trim().toLowerCase();
+      const p = document.getElementById("loginPass").value;
+      const errBox = document.getElementById("loginError");
+      const current = await getAuthCreds();
+
+      if (u === current.user.toLowerCase() && (await hashText(p)) === current.passHash) {
+        sessionStorage.setItem(SESSION_KEY, "1");
+        errBox.textContent = "";
+        unlockStudio();
+        showToast(`Selamat datang, ${current.user}!`);
+      } else {
+        errBox.textContent = "Username atau Password/PIN salah.";
+      }
+    };
+
+    document.getElementById("btnLogout").onclick = () => {
+      lockStudio();
+      showToast("Sesi dikunci.");
+    };
+
+    document.getElementById("btnSaveAuth").onclick = async () => {
+      const newU = document.getElementById("newAuthUser").value.trim();
+      const newP = document.getElementById("newAuthPass").value;
+      if (newU.length < 3) return showToast("Username minimal 3 karakter");
+      if (newP.length < 4) return showToast("Password/PIN minimal 4 karakter");
+      const passHash = await hashText(newP);
+      localStorage.setItem(AUTH_KEY, JSON.stringify({ user: newU, passHash }));
+      document.getElementById("newAuthPass").value = "";
+      showToast("Username & Password login diperbarui!");
+    };
+  }
+
   /* --- KEAMANAN & PENYIMPANAN --- */
   function isSafeDataUrl(url) {
     return typeof url === "string" && url.length < 3_500_000 && SAFE_MIME.test(url);
@@ -204,7 +207,6 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       } catch (_) {
-        // Jika kuota penuh karena foto besar, simpan tanpa dataURL gambar
         const slim = JSON.parse(JSON.stringify(state));
         slim.customLogo = "";
         slim.slides.forEach(s => { s.bgImage = ""; });
@@ -254,8 +256,7 @@
           cx.imageSmoothingEnabled = true;
           cx.imageSmoothingQuality = "high";
           cx.drawImage(img, 0, 0, w, h);
-          const out = c.toDataURL("image/jpeg", 0.9);
-          resolve(out);
+          resolve(c.toDataURL("image/jpeg", 0.9));
         };
         img.onerror = reject;
         img.src = reader.result;
@@ -265,7 +266,7 @@
     });
   }
 
-  /* --- RENDERING ENGINE (1080 / 1440PX) --- */
+  /* --- RENDERING ENGINE --- */
   function requestRender() {
     if (rafPending) return;
     rafPending = true;
@@ -302,7 +303,6 @@
     c.fillStyle = grad;
     c.fillRect(0, 0, w, h);
 
-    // Aksen cahaya & grid arsitektural
     c.save();
     if (preset === "fire" || preset === "bullish" || preset === "cyber") {
       const glow = c.createRadialGradient(w * 0.5, h * 0.28, 20, w * 0.5, h * 0.28, w * 0.48);
@@ -329,11 +329,9 @@
     c.scale(scale, scale);
     c.fillStyle = color;
     c.strokeStyle = color;
-
-    // Monogram S + C geometris presisi
     c.lineWidth = 14;
     c.lineCap = "butt";
-    // Huruf S
+
     c.beginPath();
     c.moveTo(-14, -48);
     c.lineTo(-56, -48);
@@ -347,7 +345,6 @@
     c.lineTo(-74, 32);
     c.stroke();
 
-    // Huruf C terbuka kanan
     c.beginPath();
     c.moveTo(72, -26);
     c.lineTo(72, -48);
@@ -359,7 +356,6 @@
     c.lineTo(72, 10);
     c.stroke();
 
-    // Teks SANIS CORO & 57 CREATOR 58
     c.textAlign = "center";
     c.font = "900 22px -apple-system, BlinkMacSystemFont, sans-serif";
     c.fillText("SANIS CORO", 0, 62);
@@ -486,7 +482,6 @@
     c.fillStyle = bgBase;
     c.fillRect(0, 0, w, h);
 
-    // 1. Gambar Background / Preset
     const bgImg = getCachedImage(slide.bgImage);
     if (bgImg && bgImg.complete && bgImg.naturalWidth) {
       const zoom = (slide.imgZoom || 100) / 100;
@@ -500,7 +495,6 @@
       drawPresetBackdrop(c, slide.preset || "fire", w, h, isFresh);
     }
 
-    // 2. Gradasi Bottom Fade (mulus menyatu ke dasar)
     const fadeStartRatio = Math.max(0.1, Math.min(0.85, (slide.fadeStart || 42) / 100));
     const fadeAlpha = Math.max(0, Math.min(1, (slide.fadeOpacity ?? 100) / 100));
     const fadeGrad = c.createLinearGradient(0, h * fadeStartRatio, 0, h * 0.76);
@@ -516,7 +510,6 @@
     c.fillStyle = fadeGrad;
     c.fillRect(0, h * fadeStartRatio, w, h - h * fadeStartRatio);
 
-    // Indikator Slide di Pojok Kanan Atas
     c.fillStyle = isFresh ? "rgba(255,255,255,0.88)" : "rgba(18,18,21,0.75)";
     roundRect(c, w - 136, 44, 88, 42, 21);
     c.fill();
@@ -526,15 +519,12 @@
     c.textBaseline = "middle";
     c.fillText(`${index + 1}/${state.slides.length}`, w - 92, 65);
 
-    // 3. Tata Letak Berdasarkan Jenis Slide & Template
     if (slide.type === "cover" && state.template === "breaking") {
-      // Logo di tengah atas judul
       drawBrandHeader(c, w / 2, h * 0.56, isFresh);
       const titleY = h * 0.625;
       const fontSize = state.ratio === "4:5" ? 66 : 56;
       drawHighlightedHeadline(c, slide.title, w / 2, titleY, w - 110, fontSize, fontSize * 1.12, fgBase, state.accentColor, "center");
     } else if (state.template === "editorial" && slide.type === "cover") {
-      // Editorial Studio Split + Bento
       c.fillStyle = isFresh ? "rgba(255,255,255,0.92)" : "rgba(18,18,21,0.92)";
       c.fillRect(0, h * 0.44, w, h * 0.56);
       drawBrandHeader(c, 150, 74, isFresh);
@@ -545,7 +535,6 @@
       const usedH = drawHighlightedHeadline(c, slide.title, 64, h * 0.505, w - 128, 56, 63, fgBase, state.accentColor, "left");
       wrapSimpleText(c, slide.subtitle, 64, h * 0.505 + usedH + 16, w - 128, 36, isFresh ? "#3f3f46" : "#a1a1aa", "500 25px -apple-system, sans-serif");
     } else {
-      // Slide Isi / Penutup / Fintech Card
       drawBrandHeader(c, 150, 72, isFresh);
       const cardY = h * 0.24;
       const cardH = h * 0.63;
@@ -590,7 +579,6 @@
       }
     }
 
-    // 4. Kapsul Sosial Media Pojok Kanan Bawah
     const handleTxt = (state.socialHandle || "Tiktok & IG | @saniscoro").trim();
     if (handleTxt) {
       c.font = "600 20px -apple-system, sans-serif";
@@ -668,7 +656,7 @@
     document.getElementById("captionOutput").value = lines.join("\n").trim();
   }
 
-  /* --- EKSPOR PNG 1440PX & SHARE INSTAGRAM --- */
+  /* --- EKSPOR PNG & SHARE INSTAGRAM --- */
   function renderSlideBlob(slideIndex) {
     return new Promise(resolve => {
       const targetW = state.exportWidth || 1440;
@@ -708,11 +696,7 @@
 
     if (navigator.canShare && navigator.canShare({ files })) {
       try {
-        await navigator.share({
-          files,
-          title: "Sanis Studio Post",
-          text: caption
-        });
+        await navigator.share({ files, title: "Sanis Studio Post", text: caption });
         showToast("Caption disalin & menu berbagi dibuka!");
         return;
       } catch (err) {
@@ -786,6 +770,7 @@
         scheduleSave();
       };
       const del = document.createElement("button");
+      del.type = "button";
       del.className = "bullet-del";
       del.textContent = "×";
       del.onclick = () => {
@@ -813,6 +798,7 @@
       const btns = document.createElement("div");
       btns.className = "slide-item-btns";
       const up = document.createElement("button");
+      up.type = "button";
       up.className = "mini-icon-btn"; up.textContent = "↑";
       up.onclick = () => {
         if (idx === 0) return;
@@ -821,6 +807,7 @@
         syncFormFromState(); scheduleSave();
       };
       const del = document.createElement("button");
+      del.type = "button";
       del.className = "mini-icon-btn"; del.textContent = "🗑";
       del.onclick = () => {
         if (state.slides.length <= 1) return showToast("Minimal harus ada 1 slide");
@@ -835,7 +822,6 @@
   }
 
   function bindEvents() {
-    // Desktop Tabs
     document.querySelectorAll(".tab-btn").forEach(btn => {
       btn.onclick = () => {
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -846,7 +832,6 @@
       };
     });
 
-    // Mobile Bottom Nav
     document.querySelectorAll(".mnav-btn").forEach(btn => {
       btn.onclick = () => {
         document.querySelectorAll(".mnav-btn").forEach(b => b.classList.remove("active"));
@@ -867,7 +852,6 @@
       };
     });
 
-    // Swipe di kanvas ponsel
     let touchStartX = 0;
     const touchArea = document.getElementById("canvasTouchArea");
     touchArea.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
@@ -880,7 +864,6 @@
       }
     }, { passive: true });
 
-    // Navigasi & HUD
     document.getElementById("prevSlideBtn").onclick = () => {
       if (state.activeSlide > 0) { state.activeSlide--; syncFormFromState(); }
     };
@@ -896,7 +879,6 @@
       syncFormFromState(); scheduleSave();
     };
 
-    // Template & Warna
     document.querySelectorAll(".tpl-card").forEach(card => {
       card.onclick = () => { state.template = card.dataset.tpl; syncFormFromState(); scheduleSave(); };
     });
@@ -909,7 +891,6 @@
     document.getElementById("brandMono").oninput = e => { state.brandMono = e.target.value; requestRender(); scheduleSave(); };
     document.getElementById("socialHandle").oninput = e => { state.socialHandle = e.target.value; requestRender(); scheduleSave(); };
 
-    // Upload Logo
     document.getElementById("logoUploadInput").onchange = async e => {
       const file = e.target.files[0];
       e.target.value = "";
@@ -925,7 +906,6 @@
       state.customLogo = ""; state.logoMode = "sc_vector"; syncFormFromState(); scheduleSave();
     };
 
-    // Upload Background (Klik, Drag & Drop, Paste)
     const handleBgFile = async file => {
       try {
         const dataUrl = await compressImageFile(file, 1600);
@@ -967,7 +947,6 @@
       };
     });
 
-    // Sliders & Text Inputs
     const bindSlider = (id, prop, valId) => {
       document.getElementById(id).oninput = e => {
         const v = Number(e.target.value);
@@ -1024,7 +1003,6 @@
       syncFormFromState(); scheduleSave();
     };
 
-    // Caption & Export
     document.getElementById("captionTone").onchange = e => { state.captionTone = e.target.value; generateAutoCaption(); scheduleSave(); };
     const bindPill = (id, prop) => {
       const el = document.getElementById(id);
@@ -1058,6 +1036,7 @@
     };
   }
 
+  initAuth();
   bindEvents();
   syncFormFromState();
   generateAutoCaption();

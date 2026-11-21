@@ -128,20 +128,38 @@
       inp.type = inp.type === "password" ? "text" : "password";
     };
 
+    let failCount = 0;
+    let lockUntil = 0;
+
     document.getElementById("loginForm").onsubmit = async e => {
       e.preventDefault();
+      const errBox = document.getElementById("loginError");
+      const now = Date.now();
+      if (now < lockUntil) {
+        const sisa = Math.ceil((lockUntil - now) / 1000);
+        errBox.textContent = `Terlalu banyak percobaan. Coba lagi dalam ${sisa} detik.`;
+        return;
+      }
+
       const u = document.getElementById("loginUser").value.trim().toLowerCase();
       const p = document.getElementById("loginPass").value;
-      const errBox = document.getElementById("loginError");
       const current = await getAuthCreds();
 
       if (u === current.user.toLowerCase() && (await hashText(p)) === current.passHash) {
+        failCount = 0;
         sessionStorage.setItem(SESSION_KEY, "1");
         errBox.textContent = "";
         unlockStudio();
         showToast(`Selamat datang, ${current.user}!`);
       } else {
-        errBox.textContent = "Username atau Password/PIN salah.";
+        failCount++;
+        if (failCount >= 5) {
+          lockUntil = Date.now() + 15000;
+          failCount = 0;
+          errBox.textContent = "Salah 5 kali. Tunggu 15 detik sebelum mencoba lagi.";
+        } else {
+          errBox.textContent = "Username atau Password/PIN salah.";
+        }
       }
     };
 
@@ -798,17 +816,27 @@
     state.slides.forEach((sl, idx) => {
       const item = document.createElement("div");
       item.className = `slide-item ${idx === state.activeSlide ? "active" : ""}`;
+
       const info = document.createElement("div");
       info.className = "slide-item-info";
-      info.innerHTML = `<div class="slide-item-tag">SLIDE ${idx + 1} • ${sl.type.toUpperCase()}</div>
-                        <div class="slide-item-title">${(sl.title || "Tanpa Judul").replace(/\[\[|\]\]/g, "")}</div>`;
+
+      const tagEl = document.createElement("div");
+      tagEl.className = "slide-item-tag";
+      tagEl.textContent = `SLIDE ${idx + 1} • ${String(sl.type || "content").toUpperCase()}`;
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "slide-item-title";
+      titleEl.textContent = (sl.title || "Tanpa Judul").replace(/\[\[|\]\]/g, "");
+
+      info.append(tagEl, titleEl);
       info.onclick = () => { state.activeSlide = idx; syncFormFromState(); };
 
       const btns = document.createElement("div");
       btns.className = "slide-item-btns";
       const up = document.createElement("button");
       up.type = "button";
-      up.className = "mini-icon-btn"; up.textContent = "↑";
+      up.className = "mini-icon-btn";
+      up.textContent = "↑";
       up.onclick = () => {
         if (idx === 0) return;
         [state.slides[idx - 1], state.slides[idx]] = [state.slides[idx], state.slides[idx - 1]];
@@ -817,7 +845,8 @@
       };
       const del = document.createElement("button");
       del.type = "button";
-      del.className = "mini-icon-btn"; del.textContent = "🗑";
+      del.className = "mini-icon-btn";
+      del.textContent = "🗑";
       del.onclick = () => {
         if (state.slides.length <= 1) return showToast("Minimal harus ada 1 slide");
         state.slides.splice(idx, 1);

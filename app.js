@@ -1,5 +1,82 @@
 (() => {
   "use strict";
+    /* --- SISTEM LOGIN & KEAMANAN SESI --- */
+  const AUTH_KEY = "sanisStudio_auth_v1";
+  const SESSION_KEY = "sanisStudio_session_v1";
+
+  async function hashText(str) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function getAuthCreds() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
+      if (saved && saved.user && saved.passHash) return saved;
+    } catch (_) {}
+    return { user: "saniscoro", passHash: await hashText("5758") };
+  }
+
+  function unlockStudio() {
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.getElementById("appShell").classList.remove("app-locked");
+  }
+
+  function lockStudio() {
+    sessionStorage.removeItem(SESSION_KEY);
+    document.getElementById("loginPass").value = "";
+    document.getElementById("loginError").textContent = "";
+    document.getElementById("appShell").classList.add("app-locked");
+    document.getElementById("loginScreen").classList.remove("hidden");
+  }
+
+  (async function initAuth() {
+    const creds = await getAuthCreds();
+    document.getElementById("newAuthUser").value = creds.user;
+
+    if (sessionStorage.getItem(SESSION_KEY) === "1") {
+      unlockStudio();
+    }
+
+    document.getElementById("btnTogglePass").onclick = () => {
+      const inp = document.getElementById("loginPass");
+      inp.type = inp.type === "password" ? "text" : "password";
+    };
+
+    document.getElementById("loginForm").onsubmit = async e => {
+      e.preventDefault();
+      const u = document.getElementById("loginUser").value.trim().toLowerCase();
+      const p = document.getElementById("loginPass").value;
+      const errBox = document.getElementById("loginError");
+      const current = await getAuthCreds();
+
+      if (u === current.user.toLowerCase() && (await hashText(p)) === current.passHash) {
+        sessionStorage.setItem(SESSION_KEY, "1");
+        errBox.textContent = "";
+        unlockStudio();
+        showToast(`Selamat datang, ${current.user}!`);
+      } else {
+        errBox.textContent = "Username atau Password/PIN salah.";
+      }
+    };
+
+    document.getElementById("btnLogout").onclick = () => {
+      lockStudio();
+      showToast("Sesi dikunci.");
+    };
+
+    document.getElementById("btnSaveAuth").onclick = async () => {
+      const newU = document.getElementById("newAuthUser").value.trim();
+      const newP = document.getElementById("newAuthPass").value;
+      if (newU.length < 3) return showToast("Username minimal 3 karakter");
+      if (newP.length < 4) return showToast("Password/PIN minimal 4 karakter");
+      const passHash = await hashText(newP);
+      localStorage.setItem(AUTH_KEY, JSON.stringify({ user: newU, passHash }));
+      document.getElementById("newAuthPass").value = "";
+      showToast("Username & Password login diperbarui!");
+    };
+  })();
+
 
   const STORAGE_KEY = "sanisStudio_modular_v1";
   const SAFE_MIME = /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=]+$/i;

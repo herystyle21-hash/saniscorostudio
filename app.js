@@ -34,6 +34,7 @@
         preset: "fire",
         fadeStart: 42,
         fadeOpacity: 100,
+        imgOffsetX: 0,
         imgOffsetY: 0,
         imgZoom: 100
       },
@@ -52,6 +53,7 @@
         preset: "cyber",
         fadeStart: 35,
         fadeOpacity: 95,
+        imgOffsetX: 0,
         imgOffsetY: 0,
         imgZoom: 100
       },
@@ -69,6 +71,7 @@
         preset: "bullish",
         fadeStart: 40,
         fadeOpacity: 100,
+        imgOffsetX: 0,
         imgOffsetY: 0,
         imgZoom: 100
       }
@@ -488,7 +491,7 @@
       const scale = Math.max(w / bgImg.naturalWidth, (h * 0.72) / bgImg.naturalHeight) * zoom;
       const dw = bgImg.naturalWidth * scale;
       const dh = bgImg.naturalHeight * scale;
-      const dx = (w - dw) / 2;
+      const dx = (w - dw) / 2 + ((slide.imgOffsetX || 0) / 100) * w;
       const dy = ((slide.imgOffsetY || 0) / 100) * h;
       c.drawImage(bgImg, dx, dy, dw, dh);
     } else {
@@ -709,6 +712,19 @@
   }
 
   /* --- SINKRONISASI UI & EVENT --- */
+  function syncSliderLabels(sl) {
+    document.getElementById("fadeStart").value = sl.fadeStart;
+    document.getElementById("valFadeStart").textContent = `${sl.fadeStart}%`;
+    document.getElementById("fadeOpacity").value = sl.fadeOpacity;
+    document.getElementById("valFadeOpacity").textContent = `${sl.fadeOpacity}%`;
+    document.getElementById("imgOffsetX").value = sl.imgOffsetX || 0;
+    document.getElementById("valImgX").textContent = `${sl.imgOffsetX || 0}%`;
+    document.getElementById("imgOffsetY").value = sl.imgOffsetY || 0;
+    document.getElementById("valImgY").textContent = `${sl.imgOffsetY || 0}%`;
+    document.getElementById("imgZoom").value = sl.imgZoom || 100;
+    document.getElementById("valImgZoom").textContent = `${sl.imgZoom || 100}%`;
+  }
+
   function syncFormFromState() {
     const sl = state.slides[state.activeSlide];
     document.getElementById("slideCounter").textContent = `${state.activeSlide + 1} / ${state.slides.length}`;
@@ -728,14 +744,7 @@
     document.getElementById("slideSubtitle").value = sl.subtitle;
     document.getElementById("slideQuote").value = sl.quote;
 
-    document.getElementById("fadeStart").value = sl.fadeStart;
-    document.getElementById("valFadeStart").textContent = `${sl.fadeStart}%`;
-    document.getElementById("fadeOpacity").value = sl.fadeOpacity;
-    document.getElementById("valFadeOpacity").textContent = `${sl.fadeOpacity}%`;
-    document.getElementById("imgOffsetY").value = sl.imgOffsetY;
-    document.getElementById("valImgY").textContent = `${sl.imgOffsetY}%`;
-    document.getElementById("imgZoom").value = sl.imgZoom;
-    document.getElementById("valImgZoom").textContent = `${sl.imgZoom}%`;
+    syncSliderLabels(sl);
 
     const thumb = document.getElementById("bgThumbImg");
     const ph = document.getElementById("bgPlaceholderText");
@@ -852,10 +861,59 @@
       };
     });
 
+    /* --- FITUR GESER GAMBAR LANGSUNG DI KANVAS --- */
+    let dragState = null;
+
+    canvas.addEventListener("pointerdown", e => {
+      const sl = state.slides[state.activeSlide];
+      if (!sl || !sl.bgImage) return;
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      canvas.setPointerCapture(e.pointerId);
+      canvas.classList.add("dragging");
+      dragState = {
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        origOffsetX: sl.imgOffsetX || 0,
+        origOffsetY: sl.imgOffsetY || 0,
+        rectW: rect.width,
+        rectH: rect.height
+      };
+    });
+
+    canvas.addEventListener("pointermove", e => {
+      if (!dragState || e.pointerId !== dragState.pointerId) return;
+      const sl = state.slides[state.activeSlide];
+      const deltaPctX = ((e.clientX - dragState.startX) / dragState.rectW) * 100;
+      const deltaPctY = ((e.clientY - dragState.startY) / dragState.rectH) * 100;
+      sl.imgOffsetX = Math.max(-40, Math.min(40, Math.round(dragState.origOffsetX + deltaPctX)));
+      sl.imgOffsetY = Math.max(-40, Math.min(40, Math.round(dragState.origOffsetY + deltaPctY)));
+      syncSliderLabels(sl);
+      requestRender();
+    });
+
+    const endCanvasDrag = e => {
+      if (!dragState || (e && e.pointerId !== dragState.pointerId)) return;
+      if (canvas.hasPointerCapture(dragState.pointerId)) {
+        canvas.releasePointerCapture(dragState.pointerId);
+      }
+      canvas.classList.remove("dragging");
+      dragState = null;
+      scheduleSave();
+    };
+
+    canvas.addEventListener("pointerup", endCanvasDrag);
+    canvas.addEventListener("pointercancel", endCanvasDrag);
+
     let touchStartX = 0;
     const touchArea = document.getElementById("canvasTouchArea");
-    touchArea.addEventListener("touchstart", e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    touchArea.addEventListener("touchstart", e => {
+      if (state.slides[state.activeSlide]?.bgImage) return;
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
     touchArea.addEventListener("touchend", e => {
+      if (state.slides[state.activeSlide]?.bgImage) return;
       const dx = e.changedTouches[0].screenX - touchStartX;
       if (Math.abs(dx) > 48) {
         if (dx < 0 && state.activeSlide < state.slides.length - 1) state.activeSlide++;
@@ -909,9 +967,13 @@
     const handleBgFile = async file => {
       try {
         const dataUrl = await compressImageFile(file, 1600);
-        state.slides[state.activeSlide].bgImage = dataUrl;
+        const sl = state.slides[state.activeSlide];
+        sl.bgImage = dataUrl;
+        sl.imgOffsetX = 0;
+        sl.imgOffsetY = 0;
+        sl.imgZoom = 100;
         syncFormFromState(); scheduleSave();
-        showToast("Background diperbarui!");
+        showToast("Background diperbarui! Geser foto langsung di kanvas.");
       } catch (_) { showToast("Format gambar tidak didukung"); }
     };
     document.getElementById("bgFileInput").onchange = e => {
@@ -935,9 +997,11 @@
       state.slides.forEach(s => {
         s.bgImage = cur.bgImage; s.preset = cur.preset;
         s.fadeStart = cur.fadeStart; s.fadeOpacity = cur.fadeOpacity;
-        s.imgOffsetY = cur.imgOffsetY; s.imgZoom = cur.imgZoom;
+        s.imgOffsetX = cur.imgOffsetX || 0;
+        s.imgOffsetY = cur.imgOffsetY || 0;
+        s.imgZoom = cur.imgZoom || 100;
       });
-      scheduleSave(); showToast("Background & gradasi diterapkan ke semua slide!");
+      scheduleSave(); showToast("Background & posisi diterapkan ke semua slide!");
     };
     document.querySelectorAll(".preset-btn").forEach(btn => {
       btn.onclick = () => {
@@ -957,8 +1021,20 @@
     };
     bindSlider("fadeStart", "fadeStart", "valFadeStart");
     bindSlider("fadeOpacity", "fadeOpacity", "valFadeOpacity");
+    bindSlider("imgOffsetX", "imgOffsetX", "valImgX");
     bindSlider("imgOffsetY", "imgOffsetY", "valImgY");
     bindSlider("imgZoom", "imgZoom", "valImgZoom");
+
+    document.getElementById("btnResetImgPos").onclick = () => {
+      const sl = state.slides[state.activeSlide];
+      sl.imgOffsetX = 0;
+      sl.imgOffsetY = 0;
+      sl.imgZoom = 100;
+      syncSliderLabels(sl);
+      requestRender();
+      scheduleSave();
+      showToast("Posisi foto dikembalikan ke tengah");
+    };
 
     document.getElementById("slideType").onchange = e => { state.slides[state.activeSlide].type = e.target.value; requestRender(); scheduleSave(); };
     document.getElementById("slideKicker").oninput = e => { state.slides[state.activeSlide].kicker = e.target.value; requestRender(); scheduleSave(); };
@@ -996,6 +1072,7 @@
         preset: "cyber",
         fadeStart: 40,
         fadeOpacity: 100,
+        imgOffsetX: 0,
         imgOffsetY: 0,
         imgZoom: 100
       });

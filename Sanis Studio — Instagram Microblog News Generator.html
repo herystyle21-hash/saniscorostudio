@@ -1,0 +1,3246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <title>Sanis Studio — Editorial Microblog Generator</title>
+  <style>
+    /* =========================================================================
+       DESIGN TOKENS — MATTE EDITORIAL CHARCOAL (#121215) & BENTO ARCHITECTURE
+       ========================================================================= */
+    :root {
+      --bg-canvas: #121215;
+      --bg-surface: #18181D;
+      --bg-recessed: #1E1E24;
+      --bg-hover: #25252D;
+      --border-hairline: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.18);
+      --text-primary: #F4F4F6;
+      --text-secondary: #8E8E98;
+      --text-dim: #5C5C66;
+      --accent-light: #F4F4F6;
+      --accent-ink: #121215;
+      --radius-card: 12px;
+      --radius-input: 8px;
+      --radius-pill: 999px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-condensed: Impact, "Arial Narrow", "Arial Black", sans-serif;
+      --sidebar-w: 416px;
+      --topbar-h: 60px;
+      --mobile-nav-h: 64px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      line-height: 1.45;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* =========================================================================
+       TOP ARCHITECTURAL STUDIO BAR (60PX)
+       ========================================================================= */
+    .topbar {
+      height: var(--topbar-h);
+      background: var(--bg-canvas);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: relative;
+      z-index: 40;
+    }
+
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-monogram-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .brand-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-name {
+      font-weight: 800;
+      font-size: 13.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* Center Minimal Uppercase Navigation (Desktop) */
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      padding: 4px;
+      border-radius: var(--radius-pill);
+    }
+
+    .nav-link-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .nav-link-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .nav-link-btn.active {
+      background: var(--bg-recessed);
+      color: var(--text-primary);
+      box-shadow: inset 0 0 0 1px var(--border-strong);
+    }
+
+    .nav-num {
+      color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .nav-link-btn.active .nav-num {
+      color: var(--text-primary);
+    }
+
+    /* Right Action Pills */
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill-btn {
+      appearance: none;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.16s ease;
+      white-space: nowrap;
+      min-height: 36px;
+    }
+
+    .pill-btn:hover {
+      background: var(--bg-hover);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .pill-btn-primary {
+      background: linear-gradient(135deg, #FFFFFF 0%, #D8D8DF 100%);
+      color: var(--accent-ink);
+      border-color: transparent;
+      font-weight: 800;
+    }
+
+    .pill-btn-primary:hover {
+      background: #FFFFFF;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.14);
+    }
+
+    /* =========================================================================
+       MAIN WORKSPACE SHELL (LEFT BENTO SIDEBAR + RIGHT ARCHITECTURAL STAGE)
+       ========================================================================= */
+    .workspace {
+      display: flex;
+      height: calc(100% - var(--topbar-h));
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--bg-canvas);
+      border-right: 1px solid var(--border-hairline);
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 5px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 99px;
+    }
+
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tab-pane.active {
+      display: flex;
+    }
+
+    /* Structured Bento Card */
+    .bento-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-card);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bento-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .kicker {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .kicker-badge {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    /* Uniform Architectural Inputs */
+    .input, .select, .textarea {
+      width: 100%;
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-input);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      padding: 0 11px;
+      height: 38px;
+      outline: none;
+      transition: border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .textarea {
+      height: auto;
+      min-height: 76px;
+      padding: 9px 11px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .input:focus, .select:focus, .textarea:focus {
+      border-color: var(--border-strong);
+      background: #23232A;
+    }
+
+    /* Selector Tiles */
+    .tile-btn {
+      appearance: none;
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+      border-radius: 10px;
+      color: var(--text-secondary);
+      padding: 10px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      text-align: center;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.16s ease;
+      min-height: 58px;
+    }
+
+    .tile-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .tile-btn.active {
+      background: var(--text-primary);
+      color: var(--accent-ink);
+      border-color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .tile-icon {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    /* Sleek Action Buttons inside Sidebar */
+    .btn {
+      appearance: none;
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-input);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 0 12px;
+      height: 36px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-strong);
+    }
+
+    .btn-light {
+      background: var(--text-primary);
+      color: var(--accent-ink);
+      border-color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .btn-light:hover {
+      background: #FFFFFF;
+    }
+
+    .btn-danger {
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    /* Color Swatches */
+    .swatch-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+    }
+
+    .swatch-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      cursor: pointer;
+      padding: 0;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .swatch-btn.active {
+      transform: scale(1.16);
+      border-color: #FFFFFF;
+      box-shadow: 0 0 0 2px var(--bg-canvas), 0 0 0 4px #FFFFFF;
+    }
+
+    /* Custom Architectural Range Sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+      border-radius: 99px;
+      outline: none;
+      margin: 8px 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--text-primary);
+      border: 2px solid var(--bg-canvas);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Upload Dropzone */
+    .upload-box {
+      border: 1px dashed var(--border-strong);
+      background: var(--bg-recessed);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .upload-box.drag-over {
+      border-color: #FFFFFF;
+      background: #272730;
+    }
+
+    .upload-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .upload-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .upload-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .upload-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .upload-sub {
+      font-size: 10.5px;
+      color: var(--text-secondary);
+    }
+
+    /* Carousel Deck List */
+    .deck-item {
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .deck-item:hover {
+      border-color: var(--border-strong);
+    }
+
+    .deck-item.active {
+      background: #23232B;
+      border-color: var(--text-primary);
+    }
+
+    .deck-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .deck-item.active .deck-num {
+      background: var(--text-primary);
+      color: var(--accent-ink);
+      border-color: var(--text-primary);
+    }
+
+    .deck-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .deck-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .deck-type {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+    }
+
+    /* =========================================================================
+       RIGHT ARCHITECTURAL PREVIEW STAGE
+       ========================================================================= */
+    .stage {
+      flex: 1;
+      background-color: #0E0E11;
+      background-image:
+        radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.045) 0%, rgba(14, 14, 17, 0) 68%),
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px, 32px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stage-hud {
+      width: 100%;
+      max-width: 680px;
+      background: rgba(24, 24, 29, 0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-pill);
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .hud-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hud-pill {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+    }
+
+    .hud-icon-btn {
+      appearance: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--bg-recessed);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .hud-icon-btn:hover {
+      background: var(--text-primary);
+      color: var(--accent-ink);
+    }
+
+    .canvas-frame-wrap {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      padding: 12px 0;
+    }
+
+    .canvas-studio-frame {
+      padding: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      box-shadow:
+        0 28px 70px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-height: 100%;
+      max-width: 100%;
+    }
+
+    #preview-canvas {
+      display: block;
+      border-radius: 10px;
+      max-height: calc(100vh - 185px);
+      max-width: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .stage-footer-hint {
+      font-size: 10.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Mobile Quick Bar & Bottom Tab Bar (Hidden on Desktop) */
+    .mobile-quick-bar,
+    .mobile-bottom-nav {
+      display: none;
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text-primary);
+      color: var(--accent-ink);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 10px 18px;
+      border-radius: var(--radius-pill);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.22s ease;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* =========================================================================
+       MOBILE RESPONSIVE WORKSPACE (<= 860PX) — THUMB-FRIENDLY 4-TAB SHELL
+       ========================================================================= */
+    @media (max-width: 860px) {
+      .desktop-nav,
+      .status-chip,
+      .brand-sub,
+      .stage-footer-hint,
+      .hide-mobile {
+        display: none !important;
+      }
+
+      .topbar {
+        padding: 0 14px;
+        height: 54px;
+      }
+
+      .pill-btn {
+        padding: 0 11px;
+        font-size: 10.5px;
+        min-height: 34px;
+      }
+
+      .workspace {
+        height: calc(100% - 54px - var(--mobile-nav-h) - env(safe-area-inset-bottom, 0px));
+        position: relative;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: 100%;
+        border-right: none;
+        padding: 12px 14px 24px;
+        display: none;
+      }
+
+      .sidebar.mobile-visible {
+        display: flex;
+      }
+
+      .stage {
+        width: 100%;
+        height: 100%;
+        padding: 10px 12px 12px;
+        display: none;
+      }
+
+      .stage.mobile-visible {
+        display: flex;
+      }
+
+      #preview-canvas {
+        max-height: calc(100vh - 225px);
+      }
+
+      .input, .select, .textarea {
+        font-size: 16px !important; /* Prevents iOS Safari auto-zoom */
+        min-height: 44px;
+      }
+
+      .btn, .tile-btn {
+        min-height: 44px;
+      }
+
+      .mobile-quick-bar {
+        display: flex;
+        width: 100%;
+        gap: 8px;
+        padding-top: 6px;
+      }
+
+      .mobile-quick-bar .btn {
+        flex: 1;
+        border-radius: var(--radius-pill);
+        font-size: 11px;
+      }
+
+      .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: calc(var(--mobile-nav-h) + env(safe-area-inset-bottom, 0px));
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border-hairline);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        z-index: 50;
+      }
+
+      .mob-tab {
+        appearance: none;
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-family: var(--font-sans);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        cursor: pointer;
+        min-height: 48px;
+      }
+
+      .mob-tab.active {
+        color: var(--text-primary);
+      }
+
+      .mob-tab-ico {
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      .toast {
+        bottom: calc(var(--mobile-nav-h) + 14px + env(safe-area-inset-bottom, 0px));
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- =======================================================================
+       TOP ARCHITECTURAL STUDIO BAR
+       ======================================================================= -->
+  <header class="topbar">
+    <div class="brand-cluster">
+      <div class="brand-monogram-box" aria-hidden="true">
+        <!-- Crisp Bespoke SC Monogram SVG -->
+        <svg width="22" height="22" viewBox="0 0 100 100" fill="none">
+          <path d="M16 32C16 21 25 14 37 14C45 14 51 19 51 27" stroke="#F4F4F6" stroke-width="11" stroke-linecap="butt"/>
+          <path d="M16 32C16 49 51 43 51 64C51 76 42 84 31 84C21 84 15 78 15 69" stroke="#F4F4F6" stroke-width="11" stroke-linecap="butt"/>
+          <path d="M88 33V16H71C59 16 53 31 53 49C53 67 59 82 71 82H88V65" stroke="#F4F4F6" stroke-width="11" stroke-linecap="butt"/>
+        </svg>
+      </div>
+      <div class="brand-meta">
+        <div class="brand-name-row">
+          <span class="brand-name">Sanis Studio</span>
+          <span class="status-chip"><span class="status-dot"></span>READY • 1080PX</span>
+        </div>
+        <span class="brand-sub">SANIS CORO • 57 CREATOR 58</span>
+      </div>
+    </div>
+
+    <!-- Desktop Minimal Uppercase Navigation -->
+    <nav class="desktop-nav" aria-label="Editor Sections">
+      <button type="button" class="nav-link-btn active" data-tab="style">
+        <span class="nav-num">01</span> GAYA &amp; BRAND
+      </button>
+      <button type="button" class="nav-link-btn" data-tab="content">
+        <span class="nav-num">02</span> ISI &amp; FOTO
+      </button>
+      <button type="button" class="nav-link-btn" data-tab="deck">
+        <span class="nav-num">03</span> CAROUSEL
+      </button>
+    </nav>
+
+    <!-- Right Pill Action Buttons -->
+    <div class="topbar-actions">
+      <button type="button" class="pill-btn" id="btn-export-single">
+        <span>PNG SLIDE</span>
+      </button>
+      <button type="button" class="pill-btn pill-btn-primary" id="btn-export-all">
+        <span>EXPORT ALL</span>
+        <span aria-hidden="true">↗</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- =======================================================================
+       MAIN WORKSPACE (LEFT BENTO SIDEBAR + RIGHT ARCHITECTURAL STAGE)
+       ======================================================================= -->
+  <main class="workspace">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="sidebar-panel">
+      <!-- TAB 01: GAYA & BRAND -->
+      <section class="tab-pane active" id="pane-style">
+        <div class="bento-card">
+          <div class="bento-header">
+            <span class="kicker">01 • TEMPLATE &amp; PALETTE</span>
+            <span class="kicker-badge">CONSISTENT</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Arsitektur Tata Letak</label>
+            <div class="grid-3">
+              <button type="button" class="tile-btn active" data-tpl="editorial">
+                <span class="tile-icon">🏛️</span>
+                <span>Editorial Studio</span>
+              </button>
+              <button type="button" class="tile-btn" data-tpl="breaking">
+                <span class="tile-icon">✂️</span>
+                <span>Breaking Split</span>
+              </button>
+              <button type="button" class="tile-btn" data-tpl="fintech">
+                <span class="tile-icon">🪙</span>
+                <span>Fintech 3-Coin</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Palet Warna Kanvas</label>
+            <div class="grid-2">
+              <button type="button" class="tile-btn active" data-theme="dark-studio">
+                <span class="tile-icon">🖤</span>
+                <span>Matte Dark (#121215)</span>
+              </button>
+              <button type="button" class="tile-btn" data-theme="fresh-bw">
+                <span class="tile-icon">🤍</span>
+                <span>Hitam Putih Fresh</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field-group" id="breaking-split-group">
+            <label class="field-label">Mode Pemisah Foto (Breaking)</label>
+            <div class="grid-2">
+              <button type="button" class="tile-btn active" data-split="editorial-split">
+                <span class="tile-icon">📐</span>
+                <span>Editorial Split</span>
+              </button>
+              <button type="button" class="tile-btn" data-split="cinema-fade">
+                <span class="tile-icon">🌑</span>
+                <span>Cinema Dark Fade</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-header">
+            <span class="kicker">02 • BRAND IDENTITY</span>
+            <span class="kicker-badge">LOCKED</span>
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label">Rasio Instagram</label>
+              <select class="select" id="sel-aspect">
+                <option value="4:5">4:5 Portrait (1080×1350)</option>
+                <option value="1:1">1:1 Square (1080×1080)</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Aksen Sorotan</label>
+              <div class="swatch-row" id="accent-swatches">
+                <button type="button" class="swatch-btn active" data-accent="#F4F4F6" style="background:#F4F4F6;" title="Pure Off-White"></button>
+                <button type="button" class="swatch-btn" data-accent="#09090B" style="background:#09090B;" title="Obsidian Black"></button>
+                <button type="button" class="swatch-btn" data-accent="#EF4444" style="background:#EF4444;" title="Breaking Red"></button>
+                <button type="button" class="swatch-btn" data-accent="#22C55E" style="background:#22C55E;" title="Emerald Signal"></button>
+                <button type="button" class="swatch-btn" data-accent="#38BDF8" style="background:#38BDF8;" title="Electric Sky"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label">Nama Brand</label>
+              <input type="text" class="input" id="inp-brand-name" placeholder="SANIS CORO" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Tagline / Kode</label>
+              <input type="text" class="input" id="inp-brand-tag" placeholder="57 CREATOR 58" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label">Handle Sosial Media</label>
+              <input type="text" class="input" id="inp-social" placeholder="IG & TikTok | @saniscoro" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Partner Collab (Opsional)</label>
+              <input type="text" class="input" id="inp-partner" placeholder="PARTNER" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Catatan Footer Konsisten</label>
+            <input type="text" class="input" id="inp-footer" placeholder="SANIS CORO • 57 CREATOR 58" />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Logo Utama (Default: SC Sanis Coro)</label>
+            <div class="upload-box" id="zone-logo-main">
+              <input type="file" id="file-logo-main" accept="image/*" style="display:none;" />
+              <div class="upload-preview-row">
+                <div class="upload-info">
+                  <span class="upload-title" id="lbl-logo-status">Vektor Bawaan: SC SANIS CORO 57 CREATOR 58</span>
+                  <span class="upload-sub">Otomatis adaptif hitam/putih sesuai latar</span>
+                </div>
+              </div>
+              <div class="grid-2">
+                <button type="button" class="btn" id="btn-upload-logo">📁 Ganti Logo</button>
+                <button type="button" class="btn" id="btn-reset-logo">↺ Default SC</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 02: ISI & FOTO -->
+      <section class="tab-pane" id="pane-content">
+        <div class="bento-card">
+          <div class="bento-header">
+            <span class="kicker">03 • SLIDE CONTENT</span>
+            <span class="kicker-badge" id="lbl-editing-badge">SLIDE 01 • COVER</span>
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label">Tipe Halaman</label>
+              <select class="select" id="sel-slide-type">
+                <option value="cover">Cover Utama</option>
+                <option value="content">Slide Isi Berita</option>
+                <option value="closing">Penutup / CTA</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Angka / Kode Hero</label>
+              <input type="text" class="input" id="inp-hero-stat" placeholder="01" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label">Kicker / Kategori</label>
+              <input type="text" class="input" id="inp-kicker" placeholder="EDITORIAL INSIGHT" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Teks Pill / CTA</label>
+              <input type="text" class="input" id="inp-pill" placeholder="READ MORE" />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              <span>Judul Utama</span>
+              <span style="font-size:10px; color:var(--text-dim);">Gunakan [[TEKS]] untuk sorotan</span>
+            </label>
+            <textarea class="textarea" id="inp-title" rows="2" placeholder="Tulis judul headline utama..."></textarea>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Subjudul / Ringkasan</label>
+            <textarea class="textarea" id="inp-subtitle" rows="2" placeholder="Ringkasan singkat pembuka..."></textarea>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">
+              <span>Poin Isi Berita (Slide Isi &amp; Penutup)</span>
+              <span style="font-size:10px; color:var(--text-dim);">**tebal**</span>
+            </label>
+            <textarea class="textarea" id="inp-body" rows="4" placeholder="• Poin pertama..."></textarea>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Teks Pita Bawah / Ajakan Geser</label>
+            <input type="text" class="input" id="inp-ribbon" placeholder="Geser untuk membaca selengkapnya →" />
+          </div>
+        </div>
+
+        <!-- BENTO ITEMS / 3-COIN HIGHLIGHTS -->
+        <div class="bento-card">
+          <div class="bento-header">
+            <span class="kicker">04 • BENTO CARDS / 3-COIN ITEMS</span>
+            <span class="kicker-badge">COVER GRID</span>
+          </div>
+
+          <div class="grid-3">
+            <div class="field-group">
+              <label class="field-label">Card 01 Tag</label>
+              <input type="text" class="input" id="inp-c0-ticker" placeholder="(CLARITY)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Card 02 Tag</label>
+              <input type="text" class="input" id="inp-c1-ticker" placeholder="(SYSTEM)" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Card 03 Tag</label>
+              <input type="text" class="input" id="inp-c2-ticker" placeholder="(IMPACT)" />
+            </div>
+          </div>
+
+          <div class="grid-3">
+            <div class="field-group">
+              <label class="field-label">Card 01 Judul</label>
+              <input type="text" class="input" id="inp-c0-label" placeholder="Kontras Tajam" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Card 02 Judul</label>
+              <input type="text" class="input" id="inp-c1-label" placeholder="Grid Konsisten" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Card 03 Judul</label>
+              <input type="text" class="input" id="inp-c2-label" placeholder="Pesan Singkat" />
+            </div>
+          </div>
+        </div>
+
+        <!-- MEDIA & GRADIENT -->
+        <div class="bento-card">
+          <div class="bento-header">
+            <span class="kicker">05 • MEDIA &amp; GRADIENT</span>
+            <span class="kicker-badge">DRAG / CTRL+V</span>
+          </div>
+
+          <div class="upload-box" id="zone-bg-upload">
+            <input type="file" id="file-bg-image" accept="image/*" style="display:none;" />
+            <div class="upload-preview-row">
+              <img id="img-bg-thumb" class="upload-thumb" alt="Preview media" />
+              <div class="upload-info">
+                <span class="upload-title" id="lbl-bg-name">Editorial Studio Preset</span>
+                <span class="upload-sub" id="lbl-bg-dims">Klik upload, drag &amp; drop, atau Ctrl+V</span>
+              </div>
+            </div>
+            <div class="grid-2">
+              <button type="button" class="btn btn-light" id="btn-upload-bg">📷 Upload Foto</button>
+              <button type="button" class="btn btn-danger" id="btn-clear-bg">✕ Reset Media</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Preset Visual Kurasi</label>
+            <div class="grid-2">
+              <button type="button" class="btn" data-preset="editorial-portrait">🏛️ Charcoal Studio</button>
+              <button type="button" class="btn" data-preset="fresh-grid">⬜ Fresh White Grid</button>
+              <button type="button" class="btn" data-preset="silver-studio">🩶 Silver Spotlight</button>
+              <button type="button" class="btn" data-preset="crypto-red">🔥 Breaking Crimson</button>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label">
+                <span>Posisi Vertikal (Y)</span>
+                <span id="val-offset-y">0%</span>
+              </label>
+              <input type="range" id="rng-offset-y" min="-45" max="45" value="0" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">
+                <span>Zoom Gambar</span>
+                <span id="val-zoom">100%</span>
+              </label>
+              <input type="range" id="rng-zoom" min="100" max="180" value="100" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field-group">
+              <label class="field-label">
+                <span>Mulai Gradasi</span>
+                <span id="val-fade-start">42%</span>
+              </label>
+              <input type="range" id="rng-fade-start" min="10" max="85" value="42" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">
+                <span>Kepekatan Fade</span>
+                <span id="val-fade-opacity">100%</span>
+              </label>
+              <input type="range" id="rng-fade-opacity" min="40" max="100" value="100" />
+            </div>
+          </div>
+
+          <button type="button" class="btn" id="btn-apply-bg-all" style="width:100%;">
+            <span>⧉ Terapkan Media &amp; Pengaturan ke Semua Slide</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 03: CAROUSEL DECK -->
+      <section class="tab-pane" id="pane-deck">
+        <div class="bento-card">
+          <div class="bento-header">
+            <span class="kicker">06 • CAROUSEL DECK</span>
+            <span class="kicker-badge" id="lbl-deck-count">3 / 10 SLIDE</span>
+          </div>
+
+          <div id="deck-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+
+          <div class="grid-2">
+            <button type="button" class="btn btn-light" id="btn-add-slide">+ Tambah Slide</button>
+            <button type="button" class="btn" id="btn-dup-slide">❐ Duplikat Slide</button>
+          </div>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-header">
+            <span class="kicker">07 • WORKSPACE RESET</span>
+            <span class="kicker-badge">STORAGE</span>
+          </div>
+          <p style="margin:0; font-size:11.5px; color:var(--text-secondary);">
+            Seluruh perubahan otomatis tersimpan di browser Anda. Gunakan tombol di bawah untuk mengembalikan proyek ke pengaturan awal Sanis Studio.
+          </p>
+          <button type="button" class="btn btn-danger" id="btn-reset-all" style="width:100%;">
+            <span>↺ Reset Proyek ke Default</span>
+          </button>
+        </div>
+      </section>
+    </aside>
+
+    <!-- RIGHT ARCHITECTURAL STAGE -->
+    <section class="stage mobile-visible" id="stage-panel">
+      <!-- Top Floating HUD -->
+      <div class="stage-hud">
+        <div class="hud-group">
+          <button type="button" class="hud-icon-btn" id="btn-prev-slide" title="Slide Sebelumnya" aria-label="Slide Sebelumnya">‹</button>
+          <span class="hud-pill" id="hud-slide-indicator">SLIDE 01 / 03</span>
+          <button type="button" class="hud-icon-btn" id="btn-next-slide" title="Slide Berikutnya" aria-label="Slide Berikutnya">›</button>
+        </div>
+
+        <div class="hud-group">
+          <button type="button" class="hud-pill" id="btn-hud-aspect" style="cursor:pointer;">4:5 PORTRAIT</button>
+          <span class="hud-pill hide-mobile" id="hud-tpl-tag">EDITORIAL STUDIO</span>
+        </div>
+      </div>
+
+      <!-- Centered Studio Canvas Frame -->
+      <div class="canvas-frame-wrap" id="swipe-stage">
+        <div class="canvas-studio-frame">
+          <canvas id="preview-canvas" width="1080" height="1350"></canvas>
+        </div>
+      </div>
+
+      <!-- Mobile Quick Action Strip -->
+      <div class="mobile-quick-bar">
+        <button type="button" class="btn" id="mob-btn-photo">📷 Ganti Foto</button>
+        <button type="button" class="btn btn-light" id="mob-btn-export">⬇ Unduh PNG</button>
+      </div>
+
+      <!-- Desktop Architectural Hint -->
+      <div class="stage-footer-hint">
+        <span>OUTPUT: 1080PX HIGH-DPI PNG</span>
+        <span>•</span>
+        <span>PASTE GAMBAR LANGSUNG: CTRL + V</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- MOBILE BOTTOM 4-TAB NAVIGATION -->
+  <nav class="mobile-bottom-nav" aria-label="Navigasi Ponsel">
+    <button type="button" class="mob-tab active" data-mob-view="preview">
+      <span class="mob-tab-ico">👁️</span>
+      <span>Pratinjau</span>
+    </button>
+    <button type="button" class="mob-tab" data-mob-view="style">
+      <span class="mob-tab-ico">🎨</span>
+      <span>Gaya</span>
+    </button>
+    <button type="button" class="mob-tab" data-mob-view="content">
+      <span class="mob-tab-ico">✍️</span>
+      <span>Isi &amp; Foto</span>
+    </button>
+    <button type="button" class="mob-tab" data-mob-view="deck">
+      <span class="mob-tab-ico">🗂️</span>
+      <span>Slide</span>
+    </button>
+  </nav>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast" id="toast-msg" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var STORAGE_KEY = "sanisStudio_v2";
+      var LEGACY_STORAGE_KEY = "sanisStudio_v1";
+      var imageCache = {};
+
+      // =====================================================================
+      // SAFE STORAGE HELPERS (SANDBOX-PROOF)
+      // =====================================================================
+      function safeSave(key, dataObj) {
+        try {
+          window.localStorage.setItem(key, JSON.stringify(dataObj));
+        } catch (e) {
+          // Fallback silently if storage quota or sandbox blocks localStorage
+        }
+      }
+
+      function safeLoad(key) {
+        try {
+          var raw = window.localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : null;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function showToast(msg) {
+        var el = document.getElementById("toast-msg");
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(showToast._timer);
+        showToast._timer = setTimeout(function () {
+          el.classList.remove("show");
+        }, 2300);
+      }
+
+      // =====================================================================
+      // CURATED HIGH-CONTRAST EDITORIAL PRESET BACKGROUNDS
+      // =====================================================================
+      function createPresetDataUrl(presetKey) {
+        var c = document.createElement("canvas");
+        c.width = 1080;
+        c.height = 1080;
+        var ctx = c.getContext("2d");
+
+        if (presetKey === "editorial-portrait") {
+          // Matte Charcoal Architectural Studio Backdrop + Sculptural Metallic Form
+          var bg = ctx.createRadialGradient(540, 420, 40, 540, 520, 720);
+          bg.addColorStop(0, "#34343D");
+          bg.addColorStop(0.55, "#1B1B20");
+          bg.addColorStop(1, "#121215");
+          ctx.fillStyle = bg;
+          ctx.fillRect(0, 0, 1080, 1080);
+
+          // Fine architectural grid
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.045)";
+          ctx.lineWidth = 1.5;
+          for (var gx = 0; gx <= 1080; gx += 60) {
+            ctx.beginPath();
+            ctx.moveTo(gx, 0);
+            ctx.lineTo(gx, 1080);
+            ctx.stroke();
+          }
+          for (var gy = 0; gy <= 1080; gy += 60) {
+            ctx.beginPath();
+            ctx.moveTo(0, gy);
+            ctx.lineTo(1080, gy);
+            ctx.stroke();
+          }
+
+          // Sculptural Chrome Ribbon / Lens Geometry
+          var orb = ctx.createLinearGradient(280, 220, 820, 840);
+          orb.addColorStop(0, "#F4F4F6");
+          orb.addColorStop(0.35, "#71717A");
+          orb.addColorStop(0.7, "#18181D");
+          orb.addColorStop(1, "#D4D4D8");
+          ctx.fillStyle = orb;
+          ctx.beginPath();
+          ctx.arc(540, 540, 240, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "#141418";
+          ctx.beginPath();
+          ctx.arc(590, 510, 165, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Orbital hairline & 4-point sparkle
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.28)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(540, 540, 320, -Math.PI * 0.4, Math.PI * 0.65);
+          ctx.stroke();
+
+          ctx.fillStyle = "#FFFFFF";
+          drawSparkleStar(ctx, 815, 380, 16);
+        } else if (presetKey === "fresh-grid") {
+          ctx.fillStyle = "#F4F4F6";
+          ctx.fillRect(0, 0, 1080, 1080);
+
+          ctx.fillStyle = "#121215";
+          ctx.beginPath();
+          ctx.moveTo(460, 0);
+          ctx.lineTo(1080, 0);
+          ctx.lineTo(1080, 620);
+          ctx.lineTo(740, 620);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.strokeStyle = "rgba(9, 9, 11, 0.08)";
+          ctx.lineWidth = 1.5;
+          for (var x = 0; x <= 1080; x += 60) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, 1080);
+            ctx.stroke();
+          }
+          for (var y = 0; y <= 1080; y += 60) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(1080, y);
+            ctx.stroke();
+          }
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.24)";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(820, 290, 185, 0, Math.PI * 2);
+          ctx.stroke();
+        } else if (presetKey === "silver-studio") {
+          var sg = ctx.createRadialGradient(540, 320, 30, 540, 380, 680);
+          sg.addColorStop(0, "#4A4A55");
+          sg.addColorStop(0.55, "#1E1E24");
+          sg.addColorStop(1, "#0E0E11");
+          ctx.fillStyle = sg;
+          ctx.fillRect(0, 0, 1080, 1080);
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.24)";
+          ctx.lineWidth = 2.5;
+          ctx.strokeRect(320, 160, 440, 440);
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+          ctx.strokeRect(365, 205, 350, 350);
+        } else {
+          var rg = ctx.createRadialGradient(540, 360, 40, 540, 440, 680);
+          rg.addColorStop(0, "#EF4444");
+          rg.addColorStop(0.45, "#7F1D1D");
+          rg.addColorStop(1, "#09090B");
+          ctx.fillStyle = rg;
+          ctx.fillRect(0, 0, 1080, 1080);
+
+          ctx.strokeStyle = "rgba(255, 220, 180, 0.24)";
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.arc(540, 380, 195, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        return c.toDataURL("image/jpeg", 0.92);
+      }
+
+      function drawSparkleStar(ctx, cx, cy, r) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - r);
+        ctx.quadraticCurveTo(cx, cy, cx + r, cy);
+        ctx.quadraticCurveTo(cx, cy, cx, cy + r);
+        ctx.quadraticCurveTo(cx, cy, cx - r, cy);
+        ctx.quadraticCurveTo(cx, cy, cx, cy - r);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // =====================================================================
+      // BESPOKE VECTOR LOGO: "SC SANIS CORO 57 CREATOR 58"
+      // =====================================================================
+      function drawSanisCoroBrandLogo(ctx, centerX, topY, targetWidth, isDarkInk, compactMode) {
+        var fg = isDarkInk ? "#09090B" : "#F4F4F6";
+        ctx.save();
+        var scale = targetWidth / 340;
+        ctx.translate(centerX, topY);
+        ctx.scale(scale, scale);
+
+        ctx.strokeStyle = fg;
+        ctx.fillStyle = fg;
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "miter";
+
+        var sw = 23;
+        ctx.lineWidth = sw;
+        // Geometric "S"
+        ctx.beginPath();
+        ctx.arc(-56, 48, 38, -Math.PI * 0.86, 0, false);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(-94, 48);
+        ctx.bezierCurveTo(-94, 80, -18, 66, -18, 102);
+        ctx.arc(-56, 102, 38, 0, Math.PI * 0.92, false);
+        ctx.stroke();
+
+        // Geometric "C"
+        ctx.beginPath();
+        ctx.moveTo(104, 44);
+        ctx.lineTo(104, 10);
+        ctx.lineTo(60, 10);
+        ctx.arc(60, 75, 65, -Math.PI / 2, Math.PI / 2, true);
+        ctx.lineTo(104, 140);
+        ctx.lineTo(104, 106);
+        ctx.stroke();
+
+        if (!compactMode) {
+          ctx.textBaseline = "alphabetic";
+          ctx.font = "900 32px 'Arial Black', Impact, -apple-system, sans-serif";
+          ctx.textAlign = "right";
+          ctx.fillText("SANIS", -8, 180);
+
+          // Rectangular-cut "C" in CORO
+          ctx.lineWidth = 4.2;
+          ctx.beginPath();
+          ctx.moveTo(22, 163);
+          ctx.lineTo(22, 157);
+          ctx.lineTo(6, 157);
+          ctx.lineTo(6, 180);
+          ctx.lineTo(22, 180);
+          ctx.lineTo(22, 174);
+          ctx.stroke();
+
+          ctx.font = "italic 600 31px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+          ctx.textAlign = "left";
+          ctx.fillText("ORO", 25, 180);
+
+          ctx.font = "600 12.5px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillStyle = isDarkInk ? "rgba(9,9,11,0.85)" : "rgba(244,244,246,0.85)";
+          ctx.fillText("57     C  R  E  A  T  O  R     58", 0, 204);
+        }
+
+        ctx.restore();
+        return (compactMode ? 148 : 212) * scale;
+      }
+
+      // =====================================================================
+      // DEFAULT STATE — EDITORIAL STUDIO DEFAULT + FULL CONSISTENCY
+      // =====================================================================
+      var defaultPreset0 = createPresetDataUrl("editorial-portrait");
+      var defaultPreset1 = createPresetDataUrl("silver-studio");
+
+      var state = {
+        activeTab: "style",
+        activeSlideIndex: 0,
+        brand: {
+          templateStyle: "editorial",
+          themeMode: "dark-studio",
+          splitStyle: "editorial-split",
+          name: "SANIS CORO",
+          tagline: "57   C R E A T O R   58",
+          partnerName: "PARTNER",
+          aspectRatio: "4:5",
+          accentColor: "#F4F4F6",
+          socialHandle: "IG & TikTok | @saniscoro",
+          footerNote: "SANIS CORO • 57 CREATOR 58 — Verified Editorial Microblog",
+          logoMainData: ""
+        },
+        slides: [
+          {
+            id: "s1",
+            type: "cover",
+            kicker: "DESIGN & CREATOR INSIGHT",
+            heroStat: "01",
+            title: "ARSITEKTUR VISUAL [[MICROBLOG]] KONSISTEN",
+            subtitle: "Membangun identitas editorial berkarakter tajam, terstruktur, dan mudah dikenali dalam 3 detik pertama.",
+            pillText: "READ INSIGHT",
+            ribbonText: "Geser untuk melihat 3 pilar utama →",
+            body: "• **Hierarki Tegas**: Tipografi condensed besar menciptakan fokus instan.\n• **Grid Terstruktur**: Setiap elemen memiliki ruang napas yang seimbang.\n• **Identitas Terkunci**: Logo dan margin selalu konsisten di setiap slide.",
+            bgData: defaultPreset0,
+            isCustomUpload: false,
+            fadeStart: 42,
+            fadeOpacity: 100,
+            bgOffsetY: 0,
+            bgZoom: 100,
+            coins: [
+              { symbol: "01", ticker: "(CLARITY)", label: "Kontras Tajam\nEditorial", aura: "silver", imgData: "" },
+              { symbol: "02", ticker: "(SYSTEM)", label: "Bento Grid\nTerstruktur", aura: "obsidian", imgData: "" },
+              { symbol: "03", ticker: "(IMPACT)", label: "Identitas\nKonsisten", aura: "silver", imgData: "" }
+            ]
+          },
+          {
+            id: "s2",
+            type: "content",
+            kicker: "PILAR UTAMA • 01",
+            heroStat: "3x",
+            title: "MENGAPA GAYA [[EDITORIAL STUDIO]] LEBIH DIPERCAYA?",
+            subtitle: "Pendekatan tata letak majalah modern meningkatkan retensi baca hingga akhir carousel.",
+            pillText: "VISUAL STRATEGY",
+            ribbonText: "Lanjut ke langkah penerapan →",
+            body: "• **Fokus Satu Ide**: Setiap kartu membahas satu poin inti tanpa distraksi visual.\n• **Kontras Nyaman**: Kombinasi matte charcoal dan tipografi putih hangat menjaga keterbacaan.\n• **Siap Unggah**: Ekspor resolusi penuh 1080px tajam untuk feed Instagram.",
+            bgData: defaultPreset1,
+            isCustomUpload: false,
+            fadeStart: 42,
+            fadeOpacity: 100,
+            bgOffsetY: 0,
+            bgZoom: 100,
+            coins: [
+              { symbol: "A", ticker: "(GRID)", label: "Struktur Rapi", aura: "silver", imgData: "" },
+              { symbol: "B", ticker: "(TYPE)", label: "Tipografi Tegas", aura: "obsidian", imgData: "" },
+              { symbol: "C", ticker: "(FLOW)", label: "Alur Baca Cepat", aura: "silver", imgData: "" }
+            ]
+          },
+          {
+            id: "s3",
+            type: "closing",
+            kicker: "KESIMPULAN & AKSI",
+            heroStat: "57",
+            title: "MULAI PUBLIKASI [[KONTEN BERKELAS]] HARI INI",
+            subtitle: "Ganti foto latar sesuai topik harianmu dan ekspor seluruh slide dalam satu klik.",
+            pillText: "SAVE & SHARE",
+            ribbonText: "Follow @saniscoro untuk insight berikutnya",
+            body: "• Unggah foto utama lewat tombol **Upload Foto** atau tempel langsung dengan **Ctrl+V**.\n• Gunakan tanda **[[KATA KUNCI]]** untuk menyorot kata terpenting.\n• Klik **Export All ↗** untuk mengunduh seluruh slide PNG.",
+            bgData: defaultPreset0,
+            isCustomUpload: false,
+            fadeStart: 42,
+            fadeOpacity: 100,
+            bgOffsetY: 0,
+            bgZoom: 100,
+            coins: [
+              { symbol: "57", ticker: "(SANIS)", label: "Creative\nDirection", aura: "obsidian", imgData: "" },
+              { symbol: "SC", ticker: "(CORO)", label: "Visual\nIdentity", aura: "silver", imgData: "" },
+              { symbol: "58", ticker: "(STUDIO)", label: "Microblog\nSystem", aura: "obsidian", imgData: "" }
+            ]
+          }
+        ]
+      };
+
+      // Load saved state with migration from v1
+      function initStateFromStorage() {
+        var saved = safeLoad(STORAGE_KEY) || safeLoad(LEGACY_STORAGE_KEY);
+        if (saved && saved.brand && Array.isArray(saved.slides) && saved.slides.length > 0) {
+          state.brand = Object.assign({}, state.brand, saved.brand);
+          state.slides = saved.slides;
+          state.activeSlideIndex = Math.min(saved.activeSlideIndex || 0, state.slides.length - 1);
+        }
+      }
+
+      function persistState() {
+        // Avoid storing huge base64 uploads if they exceed quota; safeSave handles errors gracefully
+        safeSave(STORAGE_KEY, {
+          activeSlideIndex: state.activeSlideIndex,
+          brand: state.brand,
+          slides: state.slides
+        });
+      }
+
+      // =====================================================================
+      // IMAGE LOADING & CLIENT-SIDE COMPRESSION (MAX 1600PX)
+      // =====================================================================
+      function preloadImage(dataUrl, callback) {
+        if (!dataUrl) {
+          if (callback) callback(null);
+          return;
+        }
+        if (imageCache[dataUrl]) {
+          if (callback) callback(imageCache[dataUrl]);
+          return;
+        }
+        var img = new Image();
+        img.onload = function () {
+          imageCache[dataUrl] = img;
+          if (callback) callback(img);
+          renderPreview();
+        };
+        img.onerror = function () {
+          if (callback) callback(null);
+        };
+        img.src = dataUrl;
+      }
+
+      function processUploadedFile(file, onComplete) {
+        if (!file || !file.type || file.type.indexOf("image/") !== 0) {
+          showToast("Pilih file gambar (JPG, PNG, WEBP)");
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var rawUrl = ev.target.result;
+          var img = new Image();
+          img.onload = function () {
+            var maxDim = 1600;
+            var w = img.width;
+            var h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w >= h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            var c = document.createElement("canvas");
+            c.width = w;
+            c.height = h;
+            var ctx = c.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            var isPng = file.type === "image/png" || file.type === "image/svg+xml";
+            var finalUrl = isPng ? c.toDataURL("image/png") : c.toDataURL("image/jpeg", 0.9);
+            imageCache[finalUrl] = img;
+            onComplete(finalUrl, file.name || "uploaded-image", w, h);
+          };
+          img.src = rawUrl;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // =====================================================================
+      // CANVAS DRAWING UTILITIES
+      // =====================================================================
+      function roundRectPath(ctx, x, y, w, h, r) {
+        var radius = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
+        ctx.arcTo(x + w, y, x + w, y + h, radius);
+        ctx.arcTo(x + w, y + h, x, y + h, radius);
+        ctx.arcTo(x, y + h, x, y, radius);
+        ctx.arcTo(x, y, x + w, y, radius);
+        ctx.closePath();
+      }
+
+      function drawCoverImage(ctx, dataUrl, dx, dy, dw, dh, offsetYPercent, zoomPercent) {
+        var img = dataUrl ? imageCache[dataUrl] : null;
+        if (!img) {
+          ctx.fillStyle = "#1E1E24";
+          ctx.fillRect(dx, dy, dw, dh);
+          return;
+        }
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(dx, dy, dw, dh);
+        ctx.clip();
+
+        var zoom = Math.max(100, zoomPercent || 100) / 100;
+        var imgRatio = img.width / img.height;
+        var boxRatio = dw / dh;
+        var drawW, drawH;
+
+        if (imgRatio > boxRatio) {
+          drawH = dh * zoom;
+          drawW = drawH * imgRatio;
+        } else {
+          drawW = dw * zoom;
+          drawH = drawW / imgRatio;
+        }
+
+        var offsetY = ((offsetYPercent || 0) / 100) * dh;
+        var drawX = dx + (dw - drawW) / 2;
+        var drawY = dy + (dh - drawH) / 2 + offsetY;
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+        ctx.restore();
+      }
+
+      function wrapLeftText(ctx, text, x, y, maxW, lineH, maxLines) {
+        var words = String(text || "").split(/\s+/);
+        var line = "";
+        var lineCount = 0;
+
+        for (var i = 0; i < words.length; i++) {
+          var test = line ? line + " " + words[i] : words[i];
+          if (ctx.measureText(test).width > maxW && line) {
+            ctx.fillText(line, x, y + lineCount * lineH);
+            lineCount++;
+            line = words[i];
+            if (maxLines && lineCount >= maxLines) return lineCount;
+          } else {
+            line = test;
+          }
+        }
+        if (line && (!maxLines || lineCount < maxLines)) {
+          ctx.fillText(line, x, y + lineCount * lineH);
+          lineCount++;
+        }
+        return lineCount;
+      }
+
+      function wrapCenteredText(ctx, text, cx, y, maxW, lineH) {
+        var words = String(text || "").split(/\s+/);
+        var line = "";
+        var lineCount = 0;
+        for (var i = 0; i < words.length; i++) {
+          var test = line ? line + " " + words[i] : words[i];
+          if (ctx.measureText(test).width > maxW && line) {
+            ctx.fillText(line, cx, y + lineCount * lineH);
+            lineCount++;
+            line = words[i];
+          } else {
+            line = test;
+          }
+        }
+        if (line) {
+          ctx.fillText(line, cx, y + lineCount * lineH);
+          lineCount++;
+        }
+        return lineCount * lineH;
+      }
+
+      // Renders headline with [[HIGHLIGHT]] tokens
+      function drawHighlightedHeadline(ctx, rawText, cx, startY, maxW, fontSize, lineH, baseColor, accentColor, invertPillOnLight) {
+        var tokens = [];
+        var regex = /\[\[(.*?)\]\]/g;
+        var lastIdx = 0;
+        var match;
+        while ((match = regex.exec(rawText)) !== null) {
+          if (match.index > lastIdx) {
+            rawText.slice(lastIdx, match.index).split(/\s+/).forEach(function (w) {
+              if (w) tokens.push({ text: w, hl: false });
+            });
+          }
+          match[1].split(/\s+/).forEach(function (w) {
+            if (w) tokens.push({ text: w, hl: true });
+          });
+          lastIdx = regex.lastIndex;
+        }
+        if (lastIdx < rawText.length) {
+          rawText.slice(lastIdx).split(/\s+/).forEach(function (w) {
+            if (w) tokens.push({ text: w, hl: false });
+          });
+        }
+
+        ctx.save();
+        ctx.font = "900 " + fontSize + "px 'Arial Black', Impact, -apple-system, sans-serif";
+        ctx.textBaseline = "middle";
+
+        var lines = [];
+        var curLine = [];
+        var curW = 0;
+        var spaceW = ctx.measureText(" ").width;
+
+        tokens.forEach(function (tok) {
+          var w = ctx.measureText(tok.text).width + (tok.hl && invertPillOnLight ? 16 : 0);
+          if (curLine.length > 0 && curW + spaceW + w > maxW) {
+            lines.push({ items: curLine, width: curW });
+            curLine = [tok];
+            curW = w;
+          } else {
+            curW += (curLine.length > 0 ? spaceW : 0) + w;
+            curLine.push(tok);
+          }
+        });
+        if (curLine.length > 0) {
+          lines.push({ items: curLine, width: curW });
+        }
+
+        lines.forEach(function (ln, li) {
+          var drawX = cx - ln.width / 2;
+          var drawY = startY + li * lineH + lineH * 0.45;
+          ln.items.forEach(function (tok, ti) {
+            var tw = ctx.measureText(tok.text).width;
+            if (tok.hl && invertPillOnLight) {
+              var padX = 12;
+              ctx.fillStyle = accentColor || "#09090B";
+              roundRectPath(ctx, drawX - 2, drawY - fontSize * 0.54, tw + padX * 2, fontSize * 1.08, 10);
+              ctx.fill();
+              ctx.fillStyle = "#FFFFFF";
+              ctx.textAlign = "left";
+              ctx.fillText(tok.text, drawX + padX - 2, drawY + 2);
+              drawX += tw + padX * 2 + spaceW;
+            } else {
+              ctx.fillStyle = tok.hl ? accentColor : baseColor;
+              ctx.textAlign = "left";
+              ctx.fillText(tok.text, drawX, drawY);
+              drawX += tw + spaceW;
+            }
+          });
+        });
+
+        ctx.restore();
+        return lines.length * lineH;
+      }
+
+      // Renders multi-line body with **bold** highlights
+      function drawFormattedBodyLines(ctx, rawBody, x, y, maxW, fontSize, lineH, textColor, boldColor) {
+        var paragraphs = String(rawBody || "").split(/\n+/);
+        var curY = y;
+        ctx.save();
+        ctx.textBaseline = "top";
+
+        paragraphs.forEach(function (para) {
+          var clean = para.replace(/\*\*/g, "");
+          var isBoldLine = para.indexOf("**") !== -1;
+          ctx.font = (isBoldLine ? "700 " : "500 ") + fontSize + "px -apple-system, BlinkMacSystemFont, sans-serif";
+          ctx.fillStyle = isBoldLine ? boldColor : textColor;
+          var used = wrapLeftText(ctx, clean, x, curY, maxW, lineH, 4);
+          curY += used * lineH + 10;
+        });
+
+        ctx.restore();
+      }
+
+      // =====================================================================
+      // MAIN CANVAS RENDERER (1080X1350 OR 1080X1080) — 3 ARCHITECTURAL TEMPLATES
+      // =====================================================================
+      function renderSlideToCanvas(canvas, slideIndex) {
+        var slide = state.slides[slideIndex] || state.slides[0];
+        var brand = state.brand;
+        var isFreshBW = (brand.themeMode || "dark-studio") === "fresh-bw";
+        var isEditorialSplit = (brand.splitStyle || "editorial-split") === "editorial-split";
+
+        var W = 1080;
+        var H = brand.aspectRatio === "4:5" ? 1350 : 1080;
+        canvas.width = W;
+        canvas.height = H;
+
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, W, H);
+
+        var tpl = brand.templateStyle || "editorial";
+
+        // -------------------------------------------------------------------
+        // TEMPLATE 1: EDITORIAL STUDIO (MATCHING REFERENCE PORTFOLIO BENTO)
+        // -------------------------------------------------------------------
+        if (tpl === "editorial") {
+          var edBg = isFreshBW ? "#F7F7F8" : "#121215";
+          var edCard = isFreshBW ? "#FFFFFF" : "#18181D";
+          var edRecessed = isFreshBW ? "#F0F0F3" : "#1E1E24";
+          var edBorder = isFreshBW ? "rgba(9, 9, 11, 0.14)" : "rgba(255, 255, 255, 0.09)";
+          var edStrongBorder = isFreshBW ? "#09090B" : "rgba(255, 255, 255, 0.18)";
+          var edText = isFreshBW ? "#09090B" : "#F4F4F6";
+          var edMuted = isFreshBW ? "#52525B" : "#8E8E98";
+
+          ctx.fillStyle = edBg;
+          ctx.fillRect(0, 0, W, H);
+
+          // Top Architectural Bar: Monogram Left + Minimal Nav/Edition Pill Right
+          if (brand.logoMainData && imageCache[brand.logoMainData]) {
+            var eImg = imageCache[brand.logoMainData];
+            var elw = 156;
+            var elh = (eImg.height / eImg.width) * elw;
+            if (elh > 84) { elh = 84; elw = (eImg.width / eImg.height) * elh; }
+            ctx.drawImage(eImg, 64, 42, elw, elh);
+          } else {
+            drawSanisCoroBrandLogo(ctx, 138, 38, 152, isFreshBW, false);
+          }
+
+          // Minimal uppercase nav indicators like reference header
+          ctx.save();
+          ctx.font = "700 16px -apple-system, sans-serif";
+          ctx.fillStyle = edMuted;
+          ctx.textAlign = "right";
+          ctx.textBaseline = "middle";
+          ctx.fillText("EDITORIAL   •   CAROUSEL", W - 260, 74);
+
+          // High-contrast Pill Badge Top-Right ("SLIDE 01/03 ↗")
+          var pillTxt = "SLIDE 0" + (slideIndex + 1) + "/0" + state.slides.length + "  ↗";
+          var pW = 178;
+          ctx.fillStyle = isFreshBW ? "#09090B" : "#F4F4F6";
+          roundRectPath(ctx, W - 64 - pW, 50, pW, 48, 24);
+          ctx.fill();
+          ctx.fillStyle = isFreshBW ? "#FFFFFF" : "#121215";
+          ctx.textAlign = "center";
+          ctx.fillText(pillTxt, W - 64 - pW / 2, 74);
+          ctx.restore();
+
+          // Hero Split Section: Oversized Condensed Left + Framed Portrait Right
+          var heroTop = 188;
+          var photoW = 396;
+          var photoH = brand.aspectRatio === "4:5" ? 464 : 352;
+          var photoX = W - 64 - photoW;
+
+          // Subtle orbital arc & sparkle star behind/beside right photo (matching reference)
+          ctx.save();
+          ctx.strokeStyle = isFreshBW ? "rgba(9,9,11,0.12)" : "rgba(255,255,255,0.12)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(photoX + photoW - 20, heroTop + 135, 115, -Math.PI * 0.35, Math.PI * 0.65);
+          ctx.stroke();
+          ctx.fillStyle = isFreshBW ? "#09090B" : "#F4F4F6";
+          drawSparkleStar(ctx, photoX + photoW + 18, heroTop + 235, 12);
+          ctx.restore();
+
+          ctx.save();
+          roundRectPath(ctx, photoX, heroTop, photoW, photoH, 20);
+          ctx.clip();
+          drawCoverImage(ctx, slide.bgData, photoX, heroTop, photoW, photoH, slide.bgOffsetY, slide.bgZoom);
+          ctx.restore();
+
+          ctx.strokeStyle = edStrongBorder;
+          ctx.lineWidth = 2;
+          roundRectPath(ctx, photoX, heroTop, photoW, photoH, 20);
+          ctx.stroke();
+
+          // Left Hero Kicker + Condensed Massive Headline + Subtitle + CTA Button
+          var leftMaxW = W - 128 - photoW - 34;
+          ctx.save();
+          ctx.fillStyle = edMuted;
+          ctx.font = "700 16px -apple-system, sans-serif";
+          ctx.textAlign = "left";
+          ctx.textBaseline = "top";
+          ctx.fillText((slide.kicker || "DESIGN & CREATOR INSIGHT").toUpperCase(), 64, heroTop + 4);
+
+          var cleanEdTitle = String(slide.title || "").replace(/\[\[|\]\]/g, "").toUpperCase();
+          ctx.fillStyle = edText;
+          ctx.font = "900 72px Impact, 'Arial Narrow', 'Arial Black', sans-serif";
+          var lineCount = wrapLeftText(ctx, cleanEdTitle, 64, heroTop + 34, leftMaxW, 74, 4);
+
+          var subY = heroTop + 34 + lineCount * 74 + 18;
+          ctx.fillStyle = edMuted;
+          ctx.font = "500 22px -apple-system, sans-serif";
+          wrapLeftText(ctx, slide.subtitle || "", 64, subY, leftMaxW, 31, 3);
+
+          // Metallic/Light Pill CTA Button at bottom-left of Hero
+          var ctaY = heroTop + photoH - 54;
+          var ctaGrad = ctx.createLinearGradient(64, ctaY, 310, ctaY + 52);
+          if (isFreshBW) {
+            ctaGrad.addColorStop(0, "#09090B");
+            ctaGrad.addColorStop(1, "#27272A");
+          } else {
+            ctaGrad.addColorStop(0, "#FFFFFF");
+            ctaGrad.addColorStop(1, "#C8C8D2");
+          }
+          ctx.fillStyle = ctaGrad;
+          roundRectPath(ctx, 64, ctaY, 246, 52, 10);
+          ctx.fill();
+
+          ctx.fillStyle = isFreshBW ? "#FFFFFF" : "#121215";
+          ctx.font = "800 17px -apple-system, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText((slide.pillText || "READ INSIGHT").toUpperCase() + "   ↗", 64 + 123, ctaY + 26);
+          ctx.restore();
+
+          // 4-Column Divided Stats Bar (Matching Reference's 6+ | 40+ | 18+ | 12 Bar)
+          var statsY = heroTop + photoH + 30;
+          var statsH = 128;
+          ctx.save();
+          ctx.fillStyle = edCard;
+          ctx.strokeStyle = edBorder;
+          ctx.lineWidth = 2;
+          roundRectPath(ctx, 64, statsY, W - 128, statsH, 18);
+          ctx.fill();
+          ctx.stroke();
+
+          var statsCols = [
+            { val: slide.heroStat || "01", lbl: "SERIES ISSUE" },
+            { val: "1080", lbl: "PIXEL CLARITY" },
+            { val: "0" + (slideIndex + 1) + "/0" + state.slides.length, lbl: "DECK INDEX" },
+            { val: "57•58", lbl: "SANIS CORO" }
+          ];
+          var colW = (W - 128) / 4;
+          statsCols.forEach(function (st, idx) {
+            var cx = 64 + colW * idx + colW / 2;
+            if (idx > 0) {
+              ctx.strokeStyle = edBorder;
+              ctx.lineWidth = 1.5;
+              ctx.beginPath();
+              ctx.moveTo(64 + colW * idx, statsY + 22);
+              ctx.lineTo(64 + colW * idx, statsY + statsH - 22);
+              ctx.stroke();
+            }
+            ctx.fillStyle = edText;
+            ctx.font = "900 38px 'Arial Black', Impact, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(st.val, cx, statsY + 48);
+
+            ctx.fillStyle = edMuted;
+            ctx.font = "700 14px -apple-system, sans-serif";
+            ctx.fillText(st.lbl, cx, statsY + 90);
+          });
+          ctx.restore();
+
+          // Section Label Row ("FEATURED HIGHLIGHTS" / "KEY TAKEAWAYS")
+          var secLabelY = statsY + statsH + 26;
+          ctx.save();
+          ctx.fillStyle = edMuted;
+          ctx.font = "700 15px -apple-system, sans-serif";
+          ctx.textAlign = "left";
+          ctx.fillText(slide.type === "cover" ? "FEATURED HIGHLIGHTS" : "EDITORIAL BREAKDOWN", 64, secLabelY);
+          ctx.textAlign = "right";
+          ctx.fillText(slide.ribbonText || "SWIPE CAROUSEL →", W - 64, secLabelY);
+          ctx.restore();
+
+          // Bottom Bento Section (3-Card Bento on Cover, Structured Bento Insight Card on Slide 2+)
+          var bentoY = secLabelY + 22;
+          var bentoH = H - bentoY - 68;
+          if (bentoH > 110) {
+            if (slide.type === "cover") {
+              var gap = 18;
+              var cardW = (W - 128 - gap * 2) / 3;
+              var coins = slide.coins || [];
+              for (var bi = 0; bi < 3; bi++) {
+                var bx = 64 + bi * (cardW + gap);
+                var item = coins[bi] || { ticker: "(ITEM)", label: "Highlight" };
+                ctx.save();
+                ctx.fillStyle = edCard;
+                ctx.strokeStyle = edBorder;
+                ctx.lineWidth = 2;
+                roundRectPath(ctx, bx, bentoY, cardW, bentoH, 18);
+                ctx.fill();
+                ctx.stroke();
+
+                // Top Recessed Visual Accent Strip inside each Bento Card
+                ctx.fillStyle = edRecessed;
+                roundRectPath(ctx, bx + 14, bentoY + 14, cardW - 28, 64, 12);
+                ctx.fill();
+
+                ctx.fillStyle = edMuted;
+                ctx.font = "700 16px monospace";
+                ctx.textAlign = "left";
+                ctx.textBaseline = "middle";
+                ctx.fillText("0" + (bi + 1) + "  " + (item.ticker || ""), bx + 28, bentoY + 46);
+
+                // Card Title
+                ctx.fillStyle = edText;
+                ctx.font = "800 24px -apple-system, sans-serif";
+                ctx.textBaseline = "top";
+                wrapLeftText(ctx, String(item.label || "").replace(/\n/g, " "), bx + 20, bentoY + 96, cardW - 40, 31, 3);
+
+                // Circular Arrow Button Bottom-Right (matching reference's ↗ circle)
+                var rBtn = 22;
+                var bCx = bx + cardW - 38;
+                var bCy = bentoY + bentoH - 38;
+                ctx.strokeStyle = edStrongBorder;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(bCx, bCy, rBtn, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = edText;
+                ctx.font = "800 19px -apple-system, sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("↗", bCx, bCy + 1);
+                ctx.restore();
+              }
+            } else {
+              ctx.save();
+              ctx.fillStyle = edCard;
+              ctx.strokeStyle = edBorder;
+              ctx.lineWidth = 2;
+              roundRectPath(ctx, 64, bentoY, W - 128, bentoH, 18);
+              ctx.fill();
+              ctx.stroke();
+
+              drawFormattedBodyLines(ctx, slide.body, 98, bentoY + 38, W - 196, 26, 38, edText, edText);
+              ctx.restore();
+            }
+          }
+
+          // Clean Bottom Studio Footer
+          ctx.save();
+          ctx.strokeStyle = edBorder;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(64, H - 52);
+          ctx.lineTo(W - 64, H - 52);
+          ctx.stroke();
+
+          ctx.fillStyle = edMuted;
+          ctx.font = "600 17px -apple-system, sans-serif";
+          ctx.textAlign = "left";
+          ctx.textBaseline = "middle";
+          ctx.fillText(brand.footerNote || "SANIS CORO • 57 CREATOR 58", 64, H - 26);
+
+          ctx.textAlign = "right";
+          ctx.fillText(brand.socialHandle || "@saniscoro", W - 64, H - 26);
+          ctx.restore();
+          return;
+        }
+
+        // -------------------------------------------------------------------
+        // TEMPLATE 2: BREAKING EDITORIAL (SHARP SPLIT OR CINEMA DARK FADE)
+        // -------------------------------------------------------------------
+        if (tpl === "breaking") {
+          if (isEditorialSplit) {
+            var bgBase = isFreshBW ? "#FFFFFF" : "#121215";
+            var inkBase = isFreshBW ? "#09090B" : "#F4F4F6";
+            var subInk = isFreshBW ? "#3F3F46" : "#8E8E98";
+
+            ctx.fillStyle = bgBase;
+            ctx.fillRect(0, 0, W, H);
+
+            var splitY = Math.round(H * (slide.type === "cover" ? 0.52 : 0.36));
+            drawCoverImage(ctx, slide.bgData, 0, 0, W, splitY, slide.bgOffsetY, slide.bgZoom);
+
+            // Top subtle vignette for crisp readability of top badges
+            var topVig = ctx.createLinearGradient(0, 0, 0, 170);
+            topVig.addColorStop(0, "rgba(9, 9, 11, 0.65)");
+            topVig.addColorStop(1, "rgba(9, 9, 11, 0)");
+            ctx.fillStyle = topVig;
+            ctx.fillRect(0, 0, W, 170);
+
+            // Top-Left Kicker Pill & Top-Right Slide Counter
+            ctx.save();
+            var kTxt = (slide.kicker || "SANIS CORO NEWS").toUpperCase();
+            ctx.font = "800 17px -apple-system, sans-serif";
+            var kW = ctx.measureText(kTxt).width + 36;
+            ctx.fillStyle = "#F4F4F6";
+            roundRectPath(ctx, 48, 36, kW, 40, 20);
+            ctx.fill();
+            ctx.fillStyle = "#09090B";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(kTxt, 48 + kW / 2, 56);
+
+            ctx.fillStyle = "#121215";
+            ctx.strokeStyle = "rgba(255,255,255,0.28)";
+            ctx.lineWidth = 2;
+            roundRectPath(ctx, W - 134, 36, 86, 40, 20);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "#F4F4F6";
+            ctx.fillText("0" + (slideIndex + 1) + "/0" + state.slides.length, W - 91, 56);
+            ctx.restore();
+
+            // Crisp architectural divider
+            ctx.fillStyle = isFreshBW ? "#09090B" : "rgba(255,255,255,0.22)";
+            ctx.fillRect(0, splitY - 2, W, 3);
+
+            // Centered Floating Logo Badge straddling split line
+            var badgeW = 266;
+            var badgeH = 144;
+            var badgeX = W / 2 - badgeW / 2;
+            var badgeY = splitY - Math.round(badgeH * 0.56);
+
+            ctx.save();
+            ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+            ctx.shadowBlur = 24;
+            ctx.shadowOffsetY = 8;
+            ctx.fillStyle = isFreshBW ? "#FFFFFF" : "#18181D";
+            roundRectPath(ctx, badgeX, badgeY, badgeW, badgeH, 18);
+            ctx.fill();
+            ctx.restore();
+
+            ctx.strokeStyle = isFreshBW ? "#09090B" : "rgba(255,255,255,0.2)";
+            ctx.lineWidth = 2;
+            roundRectPath(ctx, badgeX, badgeY, badgeW, badgeH, 18);
+            ctx.stroke();
+
+            if (brand.logoMainData && imageCache[brand.logoMainData]) {
+              var lImg = imageCache[brand.logoMainData];
+              var lw = 186;
+              var lh = (lImg.height / lImg.width) * lw;
+              if (lh > 112) { lh = 112; lw = (lImg.width / lImg.height) * lh; }
+              ctx.drawImage(lImg, W / 2 - lw / 2, badgeY + (badgeH - lh) / 2, lw, lh);
+            } else {
+              drawSanisCoroBrandLogo(ctx, W / 2, badgeY + 13, 190, isFreshBW, false);
+            }
+
+            var contentY = badgeY + badgeH + 42;
+            var hlColor = isFreshBW ? "#09090B" : "#F4F4F6";
+            if (slide.type === "cover") {
+              var hSize = brand.aspectRatio === "4:5" ? 60 : 50;
+              var usedH = drawHighlightedHeadline(
+                ctx,
+                slide.title.toUpperCase(),
+                W / 2,
+                contentY,
+                W - 110,
+                hSize,
+                hSize * 1.16,
+                inkBase,
+                hlColor,
+                isFreshBW
+              );
+
+              if (slide.subtitle) {
+                ctx.save();
+                ctx.fillStyle = subInk;
+                ctx.font = "500 24px -apple-system, sans-serif";
+                ctx.textAlign = "center";
+                wrapCenteredText(ctx, slide.subtitle, W / 2, contentY + usedH + 14, W - 150, 34);
+                ctx.restore();
+              }
+            } else {
+              var usedH2 = drawHighlightedHeadline(
+                ctx,
+                slide.title.toUpperCase(),
+                W / 2,
+                contentY - 6,
+                W - 120,
+                46,
+                54,
+                inkBase,
+                hlColor,
+                isFreshBW
+              );
+              var boxY = contentY + usedH2 + 12;
+              var boxH = H - boxY - 102;
+              if (boxH > 110) {
+                ctx.save();
+                ctx.fillStyle = isFreshBW ? "#F7F7F8" : "#18181D";
+                ctx.strokeStyle = isFreshBW ? "#09090B" : "rgba(255,255,255,0.14)";
+                ctx.lineWidth = 2;
+                roundRectPath(ctx, 64, boxY, W - 128, boxH, 20);
+                ctx.fill();
+                ctx.stroke();
+                drawFormattedBodyLines(ctx, slide.body, 100, boxY + 40, W - 200, 27, 40, inkBase, inkBase);
+                ctx.restore();
+              }
+            }
+
+            // Bottom Footer Bar
+            ctx.strokeStyle = isFreshBW ? "#E4E4E7" : "rgba(255,255,255,0.09)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(56, H - 92);
+            ctx.lineTo(W - 56, H - 92);
+            ctx.stroke();
+
+            ctx.fillStyle = subInk;
+            ctx.font = "700 19px -apple-system, sans-serif";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillText("SANIS CORO • 57 CREATOR 58", 56, H - 50);
+
+            if (brand.socialHandle) {
+              ctx.save();
+              ctx.font = "700 19px -apple-system, sans-serif";
+              var capW = ctx.measureText(brand.socialHandle).width + 44;
+              var capX = W - 56 - capW;
+              var capY = H - 71;
+              ctx.fillStyle = isFreshBW ? "#09090B" : "#F4F4F6";
+              roundRectPath(ctx, capX, capY, capW, 42, 21);
+              ctx.fill();
+              ctx.fillStyle = isFreshBW ? "#FFFFFF" : "#121215";
+              ctx.textAlign = "center";
+              ctx.fillText(brand.socialHandle, capX + capW / 2, capY + 21);
+              ctx.restore();
+            }
+            return;
+          }
+
+          // Cinema Dark Fade Mode
+          ctx.fillStyle = "#09090B";
+          ctx.fillRect(0, 0, W, H);
+          var imgH = Math.round(H * 0.68);
+          drawCoverImage(ctx, slide.bgData, 0, 0, W, imgH, slide.bgOffsetY, slide.bgZoom);
+
+          var fadeStartRatio = Math.max(0.1, Math.min(0.85, (slide.fadeStart || 42) / 100));
+          var fadeAlpha = Math.max(0.4, Math.min(1, (slide.fadeOpacity || 100) / 100));
+          var grad = ctx.createLinearGradient(0, H * fadeStartRatio, 0, imgH + 40);
+          grad.addColorStop(0, "rgba(9,9,11,0)");
+          grad.addColorStop(0.55, "rgba(9,9,11," + (0.85 * fadeAlpha).toFixed(2) + ")");
+          grad.addColorStop(1, "rgba(9,9,11,1)");
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, W, imgH + 45);
+          ctx.fillStyle = "#09090B";
+          ctx.fillRect(0, imgH + 35, W, H - imgH);
+
+          var logoTopY = Math.round(H * 0.43);
+          var logoUsedH = drawSanisCoroBrandLogo(ctx, W / 2, logoTopY - 14, 220, false, false);
+          var titleY = logoTopY + logoUsedH + 26;
+          var cineAccent = (brand.accentColor && brand.accentColor !== "#09090B") ? brand.accentColor : "#EF4444";
+
+          if (slide.type === "cover") {
+            var hSizeC = brand.aspectRatio === "4:5" ? 64 : 54;
+            var usedHC = drawHighlightedHeadline(ctx, slide.title.toUpperCase(), W / 2, titleY, W - 110, hSizeC, hSizeC * 1.15, "#F4F4F6", cineAccent, false);
+            if (slide.subtitle) {
+              ctx.save();
+              ctx.fillStyle = "#8E8E98";
+              ctx.font = "500 24px -apple-system, sans-serif";
+              ctx.textAlign = "center";
+              wrapCenteredText(ctx, slide.subtitle, W / 2, titleY + usedHC + 14, W - 150, 34);
+              ctx.restore();
+            }
+          } else {
+            var usedHC2 = drawHighlightedHeadline(ctx, slide.title.toUpperCase(), W / 2, titleY - 8, W - 120, 50, 58, "#F4F4F6", cineAccent, false);
+            var bYC = titleY + usedHC2 + 12;
+            var bHC = H - bYC - 110;
+            if (bHC > 110) {
+              ctx.save();
+              ctx.fillStyle = "#18181D";
+              ctx.strokeStyle = "rgba(255,255,255,0.14)";
+              ctx.lineWidth = 2;
+              roundRectPath(ctx, 64, bYC, W - 128, bHC, 22);
+              ctx.fill();
+              ctx.stroke();
+              drawFormattedBodyLines(ctx, slide.body, 100, bYC + 42, W - 200, 27, 40, "#F4F4F6", "#FFFFFF");
+              ctx.restore();
+            }
+          }
+
+          if (brand.socialHandle) {
+            ctx.save();
+            ctx.font = "600 21px -apple-system, sans-serif";
+            var cW2 = ctx.measureText(brand.socialHandle).width + 50;
+            var cX2 = W - 56 - cW2;
+            var cY2 = H - 82;
+            ctx.fillStyle = "#18181D";
+            ctx.strokeStyle = "rgba(255,255,255,0.18)";
+            ctx.lineWidth = 2;
+            roundRectPath(ctx, cX2, cY2, cW2, 46, 23);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "#D4D4D8";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(brand.socialHandle, cX2 + cW2 / 2, cY2 + 23);
+            ctx.restore();
+          }
+          return;
+        }
+
+        // -------------------------------------------------------------------
+        // TEMPLATE 3: FINTECH 3-COIN SHOWCASE (MATTE CHARCOAL OR FRESH B&W)
+        // -------------------------------------------------------------------
+        ctx.fillStyle = isFreshBW ? "#F7F7F8" : "#121215";
+        ctx.fillRect(0, 0, W, H);
+
+        // Subtle architectural grid
+        ctx.strokeStyle = isFreshBW ? "rgba(9, 9, 11, 0.05)" : "rgba(255, 255, 255, 0.035)";
+        ctx.lineWidth = 1.5;
+        for (var fx = 0; fx <= W; fx += 60) {
+          ctx.beginPath();
+          ctx.moveTo(fx, 0);
+          ctx.lineTo(fx, H - 72);
+          ctx.stroke();
+        }
+
+        if (brand.logoMainData && imageCache[brand.logoMainData]) {
+          var fImg = imageCache[brand.logoMainData];
+          var flw = 190;
+          var flh = (fImg.height / fImg.width) * flw;
+          if (flh > 110) { flh = 110; flw = (fImg.width / fImg.height) * flh; }
+          ctx.drawImage(fImg, W / 2 - flw / 2, 36, flw, flh);
+        } else {
+          drawSanisCoroBrandLogo(ctx, W / 2, 30, 205, isFreshBW, false);
+        }
+
+        var heroY = 244;
+        ctx.save();
+        ctx.font = "900 160px 'Arial Black', Impact, sans-serif";
+        ctx.fillStyle = isFreshBW ? "#09090B" : "#F4F4F6";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillText(slide.heroStat || "01", 345, heroY + 10);
+
+        var cleanH = String(slide.title || "").replace(/\[\[|\]\]/g, "").toUpperCase();
+        var wArr = cleanH.split(/\s+/);
+        var l1 = wArr.slice(0, Math.ceil(wArr.length / 2)).join(" ");
+        var l2 = wArr.slice(Math.ceil(wArr.length / 2)).join(" ");
+        ctx.fillStyle = isFreshBW ? "#09090B" : "#F4F4F6";
+        ctx.font = "900 52px 'Arial Black', Impact, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(l1.slice(0, 18), 372, heroY - 22);
+        ctx.fillText(l2.slice(0, 18), 372, heroY + 40);
+        ctx.restore();
+
+        // Pill Banner
+        var pillY = 360;
+        ctx.save();
+        ctx.fillStyle = isFreshBW ? "#09090B" : "#F4F4F6";
+        roundRectPath(ctx, 130, pillY, W - 260, 64, 32);
+        ctx.fill();
+        ctx.fillStyle = isFreshBW ? "#FFFFFF" : "#121215";
+        ctx.font = "800 28px -apple-system, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText((slide.pillText || "SANIS CORO • 57 CREATOR 58").toUpperCase(), W / 2, pillY + 32);
+        ctx.restore();
+
+        if (slide.type === "cover") {
+          var coinY = brand.aspectRatio === "4:5" ? 680 : 588;
+          var coinR = 132;
+          var xs = [235, 540, 845];
+          var cList = slide.coins || [];
+
+          for (var ci = 0; ci < 3; ci++) {
+            var coin = cList[ci] || { symbol: "0" + (ci + 1), ticker: "(ITEM)", label: "Highlight" };
+            var cx = xs[ci];
+
+            ctx.save();
+            var rimGrad = ctx.createLinearGradient(cx - coinR, coinY - coinR, cx + coinR, coinY + coinR);
+            rimGrad.addColorStop(0, "#FFFFFF");
+            rimGrad.addColorStop(0.5, "#71717A");
+            rimGrad.addColorStop(1, "#18181D");
+
+            ctx.shadowColor = "rgba(0,0,0,0.38)";
+            ctx.shadowBlur = 26;
+            ctx.shadowOffsetY = 14;
+            ctx.fillStyle = rimGrad;
+            ctx.beginPath();
+            ctx.arc(cx, coinY, coinR, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.fillStyle = (isFreshBW && ci !== 1) ? "#FFFFFF" : "#18181D";
+            ctx.beginPath();
+            ctx.arc(cx, coinY, coinR - 14, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = (isFreshBW && ci !== 1) ? "#09090B" : "#F4F4F6";
+            ctx.font = "900 68px 'Arial Black', Impact, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(coin.symbol || "SC", cx, coinY + 4);
+
+            ctx.fillStyle = isFreshBW ? "#09090B" : "#F4F4F6";
+            ctx.font = "900 26px -apple-system, sans-serif";
+            ctx.fillText(coin.ticker || "", cx, coinY + coinR + 42);
+
+            ctx.fillStyle = isFreshBW ? "#52525B" : "#8E8E98";
+            ctx.font = "600 22px -apple-system, sans-serif";
+            String(coin.label || "").split("\n").forEach(function (ll, li) {
+              ctx.fillText(ll, cx, coinY + coinR + 76 + li * 28);
+            });
+            ctx.restore();
+          }
+        } else {
+          var cardY = 468;
+          var cardH = H - cardY - 165;
+          ctx.save();
+          ctx.fillStyle = isFreshBW ? "#FFFFFF" : "#18181D";
+          ctx.strokeStyle = isFreshBW ? "#09090B" : "rgba(255,255,255,0.14)";
+          ctx.lineWidth = 2;
+          roundRectPath(ctx, 74, cardY, W - 148, cardH, 22);
+          ctx.fill();
+          ctx.stroke();
+          drawFormattedBodyLines(ctx, slide.body, 112, cardY + 50, W - 224, 28, 44, isFreshBW ? "#09090B" : "#F4F4F6", isFreshBW ? "#09090B" : "#FFFFFF");
+          ctx.restore();
+        }
+
+        // Solid Footer Bar
+        ctx.fillStyle = isFreshBW ? "#09090B" : "#F4F4F6";
+        ctx.fillRect(0, H - 70, W, 70);
+        ctx.fillStyle = isFreshBW ? "#FFFFFF" : "#121215";
+        ctx.font = "700 21px -apple-system, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(brand.footerNote || "SANIS CORO • 57 CREATOR 58", W / 2, H - 35);
+      }
+
+      // =====================================================================
+      // UI SYNCHRONIZATION & INTERACTIVE CONTROLS
+      // =====================================================================
+      function renderPreview() {
+        var canvas = document.getElementById("preview-canvas");
+        if (!canvas) return;
+        renderSlideToCanvas(canvas, state.activeSlideIndex);
+      }
+
+      function syncUIWithState() {
+        var brand = state.brand;
+        var slide = state.slides[state.activeSlideIndex] || state.slides[0];
+
+        // Template Tiles
+        document.querySelectorAll("[data-tpl]").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-tpl") === brand.templateStyle);
+        });
+
+        // Theme Tiles
+        document.querySelectorAll("[data-theme]").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-theme") === brand.themeMode);
+        });
+
+        // Split Mode Tiles
+        document.querySelectorAll("[data-split]").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-split") === brand.splitStyle);
+        });
+
+        var splitGroup = document.getElementById("breaking-split-group");
+        if (splitGroup) {
+          splitGroup.style.display = brand.templateStyle === "breaking" ? "flex" : "none";
+        }
+
+        // Accent Swatches
+        document.querySelectorAll("[data-accent]").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-accent").toLowerCase() === (brand.accentColor || "").toLowerCase());
+        });
+
+        // Brand Inputs
+        document.getElementById("sel-aspect").value = brand.aspectRatio;
+        document.getElementById("inp-brand-name").value = brand.name || "";
+        document.getElementById("inp-brand-tag").value = brand.tagline || "";
+        document.getElementById("inp-social").value = brand.socialHandle || "";
+        document.getElementById("inp-partner").value = brand.partnerName || "";
+        document.getElementById("inp-footer").value = brand.footerNote || "";
+
+        document.getElementById("lbl-logo-status").textContent = brand.logoMainData
+          ? "Logo Kustom Terpasang ✓"
+          : "Vektor Bawaan: SC SANIS CORO 57 CREATOR 58";
+
+        // Slide Inputs
+        document.getElementById("sel-slide-type").value = slide.type || "cover";
+        document.getElementById("inp-hero-stat").value = slide.heroStat || "";
+        document.getElementById("inp-kicker").value = slide.kicker || "";
+        document.getElementById("inp-pill").value = slide.pillText || "";
+        document.getElementById("inp-title").value = slide.title || "";
+        document.getElementById("inp-subtitle").value = slide.subtitle || "";
+        document.getElementById("inp-body").value = slide.body || "";
+        document.getElementById("inp-ribbon").value = slide.ribbonText || "";
+
+        var coins = slide.coins || [{}, {}, {}];
+        for (var i = 0; i < 3; i++) {
+          document.getElementById("inp-c" + i + "-ticker").value = (coins[i] && coins[i].ticker) || "";
+          document.getElementById("inp-c" + i + "-label").value = (coins[i] && coins[i].label) || "";
+        }
+
+        // Media Thumbnail & Sliders
+        var thumb = document.getElementById("img-bg-thumb");
+        if (thumb && slide.bgData) {
+          thumb.src = slide.bgData;
+        }
+        document.getElementById("lbl-bg-name").textContent = slide.isCustomUpload
+          ? (slide.bgFileName || "Foto Unggahan Kustom")
+          : "Curated Studio Preset";
+
+        document.getElementById("rng-offset-y").value = slide.bgOffsetY || 0;
+        document.getElementById("val-offset-y").textContent = (slide.bgOffsetY || 0) + "%";
+        document.getElementById("rng-zoom").value = slide.bgZoom || 100;
+        document.getElementById("val-zoom").textContent = (slide.bgZoom || 100) + "%";
+        document.getElementById("rng-fade-start").value = slide.fadeStart || 42;
+        document.getElementById("val-fade-start").textContent = (slide.fadeStart || 42) + "%";
+        document.getElementById("rng-fade-opacity").value = slide.fadeOpacity || 100;
+        document.getElementById("val-fade-opacity").textContent = (slide.fadeOpacity || 100) + "%";
+
+        // HUD & Badges
+        var numStr = "0" + (state.activeSlideIndex + 1) + " / 0" + state.slides.length;
+        document.getElementById("hud-slide-indicator").textContent = "SLIDE " + numStr;
+        document.getElementById("btn-hud-aspect").textContent = brand.aspectRatio === "4:5" ? "4:5 PORTRAIT" : "1:1 SQUARE";
+        var tplNames = { editorial: "EDITORIAL STUDIO", breaking: "BREAKING SPLIT", fintech: "FINTECH 3-COIN" };
+        document.getElementById("hud-tpl-tag").textContent = tplNames[brand.templateStyle] || "EDITORIAL STUDIO";
+
+        var typeNames = { cover: "COVER", content: "ISI BERITA", closing: "PENUTUP" };
+        document.getElementById("lbl-editing-badge").textContent =
+          "SLIDE 0" + (state.activeSlideIndex + 1) + " • " + (typeNames[slide.type] || "SLIDE");
+        document.getElementById("lbl-deck-count").textContent = state.slides.length + " / 10 SLIDE";
+
+        renderDeckList();
+      }
+
+      function renderDeckList() {
+        var container = document.getElementById("deck-list");
+        if (!container) return;
+        container.innerHTML = "";
+        var typeLabels = { cover: "Cover Utama", content: "Slide Isi", closing: "Penutup / CTA" };
+
+        state.slides.forEach(function (s, idx) {
+          var row = document.createElement("div");
+          row.className = "deck-item" + (idx === state.activeSlideIndex ? " active" : "");
+
+          var num = document.createElement("div");
+          num.className = "deck-num";
+          num.textContent = "0" + (idx + 1);
+
+          var meta = document.createElement("div");
+          meta.className = "deck-meta";
+          var title = document.createElement("div");
+          title.className = "deck-title";
+          title.textContent = String(s.title || "Untitled Slide").replace(/\[\[|\]\]/g, "");
+          var sub = document.createElement("div");
+          sub.className = "deck-type";
+          sub.textContent = typeLabels[s.type] || "Slide";
+          meta.appendChild(title);
+          meta.appendChild(sub);
+
+          row.appendChild(num);
+          row.appendChild(meta);
+
+          if (state.slides.length > 1) {
+            var delBtn = document.createElement("button");
+            delBtn.type = "button";
+            delBtn.className = "btn btn-danger";
+            delBtn.style.height = "30px";
+            delBtn.style.minHeight = "30px";
+            delBtn.style.padding = "0 9px";
+            delBtn.textContent = "✕";
+            delBtn.title = "Hapus Slide";
+            delBtn.addEventListener("click", function (ev) {
+              ev.stopPropagation();
+              state.slides.splice(idx, 1);
+              if (state.activeSlideIndex >= state.slides.length) {
+                state.activeSlideIndex = state.slides.length - 1;
+              }
+              fullRefresh();
+              showToast("Slide dihapus");
+            });
+            row.appendChild(delBtn);
+          }
+
+          row.addEventListener("click", function () {
+            state.activeSlideIndex = idx;
+            fullRefresh();
+          });
+
+          container.appendChild(row);
+        });
+      }
+
+      function fullRefresh() {
+        syncUIWithState();
+        var currentSlide = state.slides[state.activeSlideIndex];
+        if (currentSlide && currentSlide.bgData && !imageCache[currentSlide.bgData]) {
+          preloadImage(currentSlide.bgData, renderPreview);
+        }
+        if (state.brand.logoMainData && !imageCache[state.brand.logoMainData]) {
+          preloadImage(state.brand.logoMainData, renderPreview);
+        }
+        renderPreview();
+        persistState();
+      }
+
+      // =====================================================================
+      // NAVIGATION & MOBILE VIEW SWITCHING
+      // =====================================================================
+      function switchDesktopTab(tabName) {
+        state.activeTab = tabName;
+        document.querySelectorAll(".nav-link-btn").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-tab") === tabName);
+        });
+        document.querySelectorAll(".tab-pane").forEach(function (pane) {
+          pane.classList.toggle("active", pane.id === "pane-" + tabName);
+        });
+      }
+
+      function switchMobileView(viewName) {
+        document.querySelectorAll(".mob-tab").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-mob-view") === viewName);
+        });
+
+        var sidebar = document.getElementById("sidebar-panel");
+        var stage = document.getElementById("stage-panel");
+        if (viewName === "preview") {
+          stage.classList.add("mobile-visible");
+          sidebar.classList.remove("mobile-visible");
+          renderPreview();
+        } else {
+          stage.classList.remove("mobile-visible");
+          sidebar.classList.add("mobile-visible");
+          switchDesktopTab(viewName);
+        }
+      }
+
+      // =====================================================================
+      // PNG EXPORT ENGINE (1080PX SINGLE & SEQUENTIAL ALL SLIDES)
+      // =====================================================================
+      function downloadSlidePng(index, callback) {
+        var offCanvas = document.createElement("canvas");
+        renderSlideToCanvas(offCanvas, index);
+        var link = document.createElement("a");
+        var num = String(index + 1).padStart(2, "0");
+        link.download = "sanis-studio-slide-" + num + ".png";
+        link.href = offCanvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        if (callback) setTimeout(callback, 320);
+      }
+
+      function exportAllSlides() {
+        showToast("Mengekspor " + state.slides.length + " slide PNG (1080px)...");
+        var idx = 0;
+        function next() {
+          if (idx >= state.slides.length) {
+            showToast("Selesai! Semua " + state.slides.length + " slide berhasil diunduh.");
+            return;
+          }
+          var slide = state.slides[idx];
+          if (slide.bgData && !imageCache[slide.bgData]) {
+            preloadImage(slide.bgData, function () {
+              downloadSlidePng(idx++, next);
+            });
+          } else {
+            downloadSlidePng(idx++, next);
+          }
+        }
+        next();
+      }
+
+      // =====================================================================
+      // EVENT LISTENERS BINDING
+      // =====================================================================
+      function bindEvents() {
+        // Desktop Tabs
+        document.querySelectorAll(".nav-link-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            switchDesktopTab(btn.getAttribute("data-tab"));
+          });
+        });
+
+        // Mobile Bottom Tabs
+        document.querySelectorAll(".mob-tab").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            switchMobileView(btn.getAttribute("data-mob-view"));
+          });
+        });
+
+        // Template Switcher
+        document.querySelectorAll("[data-tpl]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            state.brand.templateStyle = btn.getAttribute("data-tpl");
+            fullRefresh();
+          });
+        });
+
+        // Theme Mode Switcher
+        document.querySelectorAll("[data-theme]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            state.brand.themeMode = btn.getAttribute("data-theme");
+            if (state.brand.themeMode === "fresh-bw") {
+              state.brand.accentColor = "#09090B";
+              state.slides.forEach(function (s, idx) {
+                if (!s.isCustomUpload) {
+                  s.bgData = createPresetDataUrl(idx % 2 === 0 ? "fresh-grid" : "silver-studio");
+                }
+              });
+            } else {
+              state.brand.accentColor = "#F4F4F6";
+              state.slides.forEach(function (s, idx) {
+                if (!s.isCustomUpload) {
+                  s.bgData = createPresetDataUrl(idx % 2 === 0 ? "editorial-portrait" : "silver-studio");
+                }
+              });
+            }
+            fullRefresh();
+            showToast(state.brand.themeMode === "fresh-bw" ? "Tema Hitam Putih Fresh aktif" : "Tema Matte Dark (#121215) aktif");
+          });
+        });
+
+        // Split Style Switcher
+        document.querySelectorAll("[data-split]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            state.brand.splitStyle = btn.getAttribute("data-split");
+            fullRefresh();
+          });
+        });
+
+        // Accent Color Swatches
+        document.querySelectorAll("[data-accent]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            state.brand.accentColor = btn.getAttribute("data-accent");
+            fullRefresh();
+          });
+        });
+
+        // Aspect Ratio Select & HUD Toggle
+        document.getElementById("sel-aspect").addEventListener("change", function (e) {
+          state.brand.aspectRatio = e.target.value;
+          fullRefresh();
+        });
+
+        document.getElementById("btn-hud-aspect").addEventListener("click", function () {
+          state.brand.aspectRatio = state.brand.aspectRatio === "4:5" ? "1:1" : "4:5";
+          fullRefresh();
+        });
+
+        // Brand Text Inputs
+        var brandBindings = [
+          ["inp-brand-name", "name"],
+          ["inp-brand-tag", "tagline"],
+          ["inp-social", "socialHandle"],
+          ["inp-partner", "partnerName"],
+          ["inp-footer", "footerNote"]
+        ];
+        brandBindings.forEach(function (pair) {
+          document.getElementById(pair[0]).addEventListener("input", function (e) {
+            state.brand[pair[1]] = e.target.value;
+            renderPreview();
+            persistState();
+          });
+        });
+
+        // Slide Content Inputs
+        document.getElementById("sel-slide-type").addEventListener("change", function (e) {
+          state.slides[state.activeSlideIndex].type = e.target.value;
+          fullRefresh();
+        });
+
+        var slideBindings = [
+          ["inp-hero-stat", "heroStat"],
+          ["inp-kicker", "kicker"],
+          ["inp-pill", "pillText"],
+          ["inp-title", "title"],
+          ["inp-subtitle", "subtitle"],
+          ["inp-body", "body"],
+          ["inp-ribbon", "ribbonText"]
+        ];
+        slideBindings.forEach(function (pair) {
+          document.getElementById(pair[0]).addEventListener("input", function (e) {
+            state.slides[state.activeSlideIndex][pair[1]] = e.target.value;
+            if (pair[1] === "title") renderDeckList();
+            renderPreview();
+            persistState();
+          });
+        });
+
+        // 3 Bento / Coin Inputs
+        for (var ci = 0; ci < 3; ci++) {
+          (function (index) {
+            document.getElementById("inp-c" + index + "-ticker").addEventListener("input", function (e) {
+              var s = state.slides[state.activeSlideIndex];
+              if (!s.coins) s.coins = [{}, {}, {}];
+              s.coins[index].ticker = e.target.value;
+              renderPreview();
+              persistState();
+            });
+            document.getElementById("inp-c" + index + "-label").addEventListener("input", function (e) {
+              var s = state.slides[state.activeSlideIndex];
+              if (!s.coins) s.coins = [{}, {}, {}];
+              s.coins[index].label = e.target.value;
+              renderPreview();
+              persistState();
+            });
+          })(ci);
+        }
+
+        // Media Upload (Button, Drag & Drop, Global Ctrl+V Paste)
+        var fileBgInput = document.getElementById("file-bg-image");
+        document.getElementById("btn-upload-bg").addEventListener("click", function () {
+          fileBgInput.value = "";
+          fileBgInput.click();
+        });
+        document.getElementById("mob-btn-photo").addEventListener("click", function () {
+          fileBgInput.value = "";
+          fileBgInput.click();
+        });
+
+        fileBgInput.addEventListener("change", function (e) {
+          if (e.target.files && e.target.files[0]) {
+            processUploadedFile(e.target.files[0], function (url, name) {
+              var s = state.slides[state.activeSlideIndex];
+              s.bgData = url;
+              s.bgFileName = name;
+              s.isCustomUpload = true;
+              fullRefresh();
+              showToast("Foto berhasil dipasang ke Slide 0" + (state.activeSlideIndex + 1));
+            });
+          }
+        });
+
+        var bgZone = document.getElementById("zone-bg-upload");
+        bgZone.addEventListener("dragover", function (e) {
+          e.preventDefault();
+          bgZone.classList.add("drag-over");
+        });
+        bgZone.addEventListener("dragleave", function () {
+          bgZone.classList.remove("drag-over");
+        });
+        bgZone.addEventListener("drop", function (e) {
+          e.preventDefault();
+          bgZone.classList.remove("drag-over");
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+            processUploadedFile(e.dataTransfer.files[0], function (url, name) {
+              var s = state.slides[state.activeSlideIndex];
+              s.bgData = url;
+              s.bgFileName = name;
+              s.isCustomUpload = true;
+              fullRefresh();
+              showToast("Foto dipasang via Drag & Drop");
+            });
+          }
+        });
+
+        // Global Ctrl+V Image Paste
+        window.addEventListener("paste", function (e) {
+          if (!e.clipboardData || !e.clipboardData.items) return;
+          for (var i = 0; i < e.clipboardData.items.length; i++) {
+            var item = e.clipboardData.items[i];
+            if (item.type && item.type.indexOf("image/") === 0) {
+              var file = item.getAsFile();
+              if (file) {
+                processUploadedFile(file, function (url) {
+                  var s = state.slides[state.activeSlideIndex];
+                  s.bgData = url;
+                  s.bgFileName = "Clipboard Image";
+                  s.isCustomUpload = true;
+                  fullRefresh();
+                  showToast("Gambar dari clipboard berhasil ditempel");
+                });
+              }
+              break;
+            }
+          }
+        });
+
+        // Clear / Reset Media
+        document.getElementById("btn-clear-bg").addEventListener("click", function () {
+          var s = state.slides[state.activeSlideIndex];
+          s.bgData = createPresetDataUrl(state.brand.themeMode === "fresh-bw" ? "fresh-grid" : "editorial-portrait");
+          s.isCustomUpload = false;
+          s.bgOffsetY = 0;
+          s.bgZoom = 100;
+          fullRefresh();
+          showToast("Media dikembalikan ke preset studio");
+        });
+
+        // Curated Visual Presets
+        document.querySelectorAll("[data-preset]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var key = btn.getAttribute("data-preset");
+            var s = state.slides[state.activeSlideIndex];
+            s.bgData = createPresetDataUrl(key);
+            s.isCustomUpload = false;
+            fullRefresh();
+            showToast("Preset visual diterapkan");
+          });
+        });
+
+        // Sliders
+        document.getElementById("rng-offset-y").addEventListener("input", function (e) {
+          var val = parseInt(e.target.value, 10) || 0;
+          state.slides[state.activeSlideIndex].bgOffsetY = val;
+          document.getElementById("val-offset-y").textContent = val + "%";
+          renderPreview();
+          persistState();
+        });
+
+        document.getElementById("rng-zoom").addEventListener("input", function (e) {
+          var val = parseInt(e.target.value, 10) || 100;
+          state.slides[state.activeSlideIndex].bgZoom = val;
+          document.getElementById("val-zoom").textContent = val + "%";
+          renderPreview();
+          persistState();
+        });
+
+        document.getElementById("rng-fade-start").addEventListener("input", function (e) {
+          var val = parseInt(e.target.value, 10) || 42;
+          state.slides[state.activeSlideIndex].fadeStart = val;
+          document.getElementById("val-fade-start").textContent = val + "%";
+          renderPreview();
+          persistState();
+        });
+
+        document.getElementById("rng-fade-opacity").addEventListener("input", function (e) {
+          var val = parseInt(e.target.value, 10) || 100;
+          state.slides[state.activeSlideIndex].fadeOpacity = val;
+          document.getElementById("val-fade-opacity").textContent = val + "%";
+          renderPreview();
+          persistState();
+        });
+
+        // Apply Media & Settings to All Slides
+        document.getElementById("btn-apply-bg-all").addEventListener("click", function () {
+          var src = state.slides[state.activeSlideIndex];
+          state.slides.forEach(function (s) {
+            s.bgData = src.bgData;
+            s.isCustomUpload = src.isCustomUpload;
+            s.bgFileName = src.bgFileName;
+            s.bgOffsetY = src.bgOffsetY;
+            s.bgZoom = src.bgZoom;
+            s.fadeStart = src.fadeStart;
+            s.fadeOpacity = src.fadeOpacity;
+          });
+          fullRefresh();
+          showToast("Media & pengaturan diterapkan ke seluruh slide");
+        });
+
+        // Custom Brand Logo Upload & Reset
+        var fileLogoInput = document.getElementById("file-logo-main");
+        document.getElementById("btn-upload-logo").addEventListener("click", function () {
+          fileLogoInput.value = "";
+          fileLogoInput.click();
+        });
+
+        fileLogoInput.addEventListener("change", function (e) {
+          if (e.target.files && e.target.files[0]) {
+            processUploadedFile(e.target.files[0], function (url) {
+              state.brand.logoMainData = url;
+              fullRefresh();
+              showToast("Logo kustom berhasil diperbarui");
+            });
+          }
+        });
+
+        document.getElementById("btn-reset-logo").addEventListener("click", function () {
+          state.brand.logoMainData = "";
+          fullRefresh();
+          showToast("Logo dikembalikan ke vektor SC Sanis Coro");
+        });
+
+        // Prev / Next Slide Navigation
+        document.getElementById("btn-prev-slide").addEventListener("click", function () {
+          state.activeSlideIndex = (state.activeSlideIndex - 1 + state.slides.length) % state.slides.length;
+          fullRefresh();
+        });
+
+        document.getElementById("btn-next-slide").addEventListener("click", function () {
+          state.activeSlideIndex = (state.activeSlideIndex + 1) % state.slides.length;
+          fullRefresh();
+        });
+
+        // Touch Swipe Gesture on Mobile Canvas Stage
+        var swipeStage = document.getElementById("swipe-stage");
+        var touchStartX = 0;
+        swipeStage.addEventListener("touchstart", function (e) {
+          if (e.changedTouches && e.changedTouches[0]) {
+            touchStartX = e.changedTouches[0].clientX;
+          }
+        }, { passive: true });
+
+        swipeStage.addEventListener("touchend", function (e) {
+          if (!e.changedTouches || !e.changedTouches[0]) return;
+          var dx = e.changedTouches[0].clientX - touchStartX;
+          if (Math.abs(dx) > 48) {
+            if (dx < 0) {
+              state.activeSlideIndex = (state.activeSlideIndex + 1) % state.slides.length;
+            } else {
+              state.activeSlideIndex = (state.activeSlideIndex - 1 + state.slides.length) % state.slides.length;
+            }
+            fullRefresh();
+          }
+        }, { passive: true });
+
+        // Add / Duplicate Slide
+        document.getElementById("btn-add-slide").addEventListener("click", function () {
+          if (state.slides.length >= 10) {
+            showToast("Maksimal 10 slide per carousel");
+            return;
+          }
+          var nextNum = state.slides.length + 1;
+          state.slides.push({
+            id: "s" + Date.now(),
+            type: "content",
+            kicker: "INSIGHT • 0" + nextNum,
+            heroStat: "0" + nextNum,
+            title: "POIN PEMBAHASAN [[BERIKUTNYA]] UNTUK AUDIENS",
+            subtitle: "Penjelasan ringkas dan terstruktur dengan gaya visual yang konsisten.",
+            pillText: "READ MORE",
+            ribbonText: "Geser ke slide berikutnya →",
+            body: "• **Fakta Utama**: Tuliskan data atau kutipan penting di sini.\n• **Implikasi**: Jelaskan dampaknya secara singkat dan jelas.",
+            bgData: createPresetDataUrl(state.brand.themeMode === "fresh-bw" ? "fresh-grid" : "silver-studio"),
+            isCustomUpload: false,
+            fadeStart: 42,
+            fadeOpacity: 100,
+            bgOffsetY: 0,
+            bgZoom: 100,
+            coins: [
+              { symbol: "01", ticker: "(POINT)", label: "Highlight 1", aura: "silver", imgData: "" },
+              { symbol: "02", ticker: "(POINT)", label: "Highlight 2", aura: "obsidian", imgData: "" },
+              { symbol: "03", ticker: "(POINT)", label: "Highlight 3", aura: "silver", imgData: "" }
+            ]
+          });
+          state.activeSlideIndex = state.slides.length - 1;
+          fullRefresh();
+          showToast("Slide baru ditambahkan");
+        });
+
+        document.getElementById("btn-dup-slide").addEventListener("click", function () {
+          if (state.slides.length >= 10) {
+            showToast("Maksimal 10 slide per carousel");
+            return;
+          }
+          var copy = JSON.parse(JSON.stringify(state.slides[state.activeSlideIndex]));
+          copy.id = "s" + Date.now();
+          state.slides.splice(state.activeSlideIndex + 1, 0, copy);
+          state.activeSlideIndex += 1;
+          fullRefresh();
+          showToast("Slide berhasil diduplikat");
+        });
+
+        // Reset All Workspace
+        document.getElementById("btn-reset-all").addEventListener("click", function () {
+          try {
+            window.localStorage.removeItem(STORAGE_KEY);
+            window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+          } catch (e) {}
+          window.location.reload();
+        });
+
+        // Export Buttons
+        document.getElementById("btn-export-single").addEventListener("click", function () {
+          downloadSlidePng(state.activeSlideIndex);
+          showToast("PNG Slide 0" + (state.activeSlideIndex + 1) + " (1080px) diunduh");
+        });
+
+        document.getElementById("mob-btn-export").addEventListener("click", function () {
+          downloadSlidePng(state.activeSlideIndex);
+          showToast("PNG Slide 0" + (state.activeSlideIndex + 1) + " diunduh");
+        });
+
+        document.getElementById("btn-export-all").addEventListener("click", exportAllSlides);
+      }
+
+      // =====================================================================
+      // BOOTSTRAP APPLICATION
+      // =====================================================================
+      window.addEventListener("DOMContentLoaded", function () {
+        initStateFromStorage();
+        bindEvents();
+
+        // Preload images for all slides before final render
+        state.slides.forEach(function (s) {
+          if (s.bgData) preloadImage(s.bgData);
+        });
+        if (state.brand.logoMainData) {
+          preloadImage(state.brand.logoMainData);
+        }
+
+        fullRefresh();
+      });
+    })();
+  </script>
+</body>
+</html>

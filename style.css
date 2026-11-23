@@ -16,6 +16,10 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #eef6ff;
@@ -51,6 +55,7 @@ body {
   z-index: 900;
   display: flex;
   flex-direction: column;
+  scroll-behavior: smooth;
   background-color: #eef6ff;
   background-image:
     radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.94) 0%, rgba(232, 244, 255, 0.8) 46%, rgba(208, 230, 254, 0.86) 100%),
@@ -59,7 +64,7 @@ body {
     url("hero-bg.png");
   background-size: 100% 100%, 48px 48px, 48px 48px, cover;
   background-position: center;
-  background-repeat: no-repeat, repeat, repeat, no-repeat;
+  background-attachment: local;
   color: #0f172a;
   overflow-y: auto;
 }
@@ -77,8 +82,8 @@ body {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0) 100%);
-  backdrop-filter: blur(6px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(255, 255, 255, 0) 100%);
+  backdrop-filter: blur(8px);
 }
 
 .lp-brand {
@@ -136,7 +141,7 @@ body {
   gap: 6px;
   padding: 6px 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(56, 189, 248, 0.42);
@@ -287,9 +292,9 @@ body {
   cursor: pointer;
 }
 
-/* Hero Section Tengah */
+/* 01. Hero Section Tengah */
 .lp-hero {
-  flex: 1;
+  min-height: calc(100vh - 76px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -367,11 +372,12 @@ body {
   gap: 10px;
   padding: 11px 28px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(8px);
   color: #0f172a;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   border: 1.5px solid #38bdf8;
   box-shadow: 0 4px 18px rgba(56, 189, 248, 0.3);
   cursor: pointer;
@@ -382,6 +388,163 @@ body {
   background: #0f172a;
   color: #ffffff;
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.65);
+}
+
+/* 02. ABOUT SECTION & MODULAR LANDING SECTIONS */
+.lp-section {
+  padding: 72px 24px 96px;
+  position: relative;
+  z-index: 2;
+}
+
+.lp-container {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.lp-sec-header {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 40px;
+}
+
+.lp-sec-badge {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #0284c7;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+}
+
+.lp-sec-title {
+  font-size: clamp(26px, 3.6vw, 36px);
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  color: #09090b;
+}
+
+.lp-sec-title span {
+  color: #0284c7;
+  font-style: italic;
+}
+
+.lp-sec-lead {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #334155;
+  margin-top: 12px;
+}
+
+.lp-about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.hud-glass-card {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.42);
+  border-radius: 20px;
+  padding: 24px 22px;
+  box-shadow:
+    0 10px 32px rgba(14, 165, 233, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+}
+
+.hud-glass-card:hover {
+  transform: translateY(-4px);
+  border-color: #0284c7;
+  box-shadow: 0 16px 38px rgba(14, 165, 233, 0.18);
+}
+
+.hud-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.hud-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  color: #0284c7;
+}
+
+.hud-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #090d16;
+  color: #38bdf8;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+.hud-glass-card h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #09090b;
+  margin-bottom: 8px;
+}
+
+.hud-glass-card p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.hud-metrics-bar {
+  margin-top: 22px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 20px;
+  padding: 18px 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  flex-wrap: wrap;
+  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.1);
+}
+
+.hud-metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-metric strong {
+  font-size: 20px;
+  font-weight: 900;
+  color: #09090b;
+  letter-spacing: 0.5px;
+}
+
+.hud-metric span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #0284c7;
+  margin-top: 2px;
+}
+
+.hud-metric-div {
+  width: 1px;
+  height: 34px;
+  background: rgba(56, 189, 248, 0.35);
 }
 
 /* Modal Pop-up Login (Glassmorphism Terang) */
@@ -1202,6 +1365,12 @@ input[type="range"] {
     display: inline-flex;
   }
   .lp-status-pill {
+    display: none;
+  }
+  .lp-about-grid {
+    grid-template-columns: 1fr;
+  }
+  .hud-metric-div {
     display: none;
   }
   .desktop-tabs {

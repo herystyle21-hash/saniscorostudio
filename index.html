@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';" />
   <title>Sanis Coro — Studio Konten Instagram</title>
-  <link rel="stylesheet" href="style.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
   <!-- HALAMAN DEPAN (LANDING PAGE FUTURISTIK) -->
@@ -18,16 +18,16 @@
         </div>
         <div class="lp-brand-info">
           <div class="lp-brand-text"><strong>SANIS</strong> <em>CORO</em></div>
-          <div class="lp-brand-code"> MEDIA </div>
+          <div class="lp-brand-code">SYS // 57-58</div>
         </div>
       </a>
 
       <nav class="lp-menu-capsule" id="lpMenu" aria-label="Navigasi Utama">
-        <a href="#home" class="lp-link active"><span class="nav-idx"></span>Home</a>
-        <a href="#about" class="lp-link"><span class="nav-idx"></span>About</a>
-        <a href="#features" class="lp-link"><span class="nav-idx"></span>Features</a>
-        <a href="#services" class="lp-link"><span class="nav-idx"></span>Services</a>
-        <a href="#contact" class="lp-link"><span class="nav-idx"></span>Contact</a>
+        <a href="#home" class="lp-link active"><span class="nav-idx">01</span>Home</a>
+        <a href="#about" class="lp-link"><span class="nav-idx">02</span>About</a>
+        <a href="#features" class="lp-link"><span class="nav-idx">03</span>Features</a>
+        <a href="#services" class="lp-link"><span class="nav-idx">04</span>Services</a>
+        <a href="#contact" class="lp-link"><span class="nav-idx">05</span>Contact</a>
       </nav>
 
       <div class="lp-nav-right">
@@ -47,7 +47,7 @@
       </div>
     </header>
 
-    <!-- HERO SECTION -->
+    <!-- 01. HERO SECTION -->
     <main class="lp-hero" id="home">
       <div class="lp-hero-ring" aria-hidden="true"></div>
 
@@ -68,13 +68,81 @@
         <p class="lp-tagline">Innovate Today &nbsp;•&nbsp; Inspire Tomorrow</p>
 
         <div class="lp-hero-cta">
-          <button type="button" class="btn-explore-futuristic" id="btnHeroExplore">
+          <a href="#about" class="btn-explore-futuristic">
             <span>Explore More</span>
             <span class="arrow">›</span>
-          </button>
+          </a>
         </div>
       </div>
     </main>
+
+    <!-- 02. ABOUT SECTION (HUD GLASSMORPHISM) -->
+    <section class="lp-section" id="about">
+      <div class="lp-container">
+        <div class="lp-sec-header">
+          <div class="lp-sec-badge">MODULE 02 // IDENTITY &amp; VISION</div>
+          <h2 class="lp-sec-title">TENTANG <span>SANIS CORO</span></h2>
+          <p class="lp-sec-lead">
+            Ekosistem kreatif dan studio produksi konten digital yang dirancang untuk mengubah informasi kompleks menjadi visual microblog &amp; carousel berkelas editorial dalam hitungan menit.
+          </p>
+        </div>
+
+        <div class="lp-about-grid">
+          <article class="hud-glass-card">
+            <div class="hud-card-top">
+              <span class="hud-code">01 // CREATIVE ENGINE</span>
+              <span class="hud-icon">⚡</span>
+            </div>
+            <h3>Produksi Visual Presisi</h3>
+            <p>
+              Menggabungkan tipografi tegas, tata letak editorial modern, dan kontrol rasio presisi (4:5 &amp; 1:1) untuk menghasilkan konten siap publikasi beresolusi tinggi hingga 1440px.
+            </p>
+          </article>
+
+          <article class="hud-glass-card">
+            <div class="hud-card-top">
+              <span class="hud-code">02 // CORE PHILOSOPHY</span>
+              <span class="hud-icon">💠</span>
+            </div>
+            <h3>Innovate Today, Inspire Tomorrow</h3>
+            <p>
+              Berlandaskan kecepatan eksekusi dan kejelasan pesan. Setiap slide dirancang agar mudah dipindai mata, tajam secara visual, dan relevan bagi audiens media sosial masa kini.
+            </p>
+          </article>
+
+          <article class="hud-glass-card">
+            <div class="hud-card-top">
+              <span class="hud-code">03 // SYSTEM 57–58</span>
+              <span class="hud-icon">🛡️</span>
+            </div>
+            <h3>Workspace Mandiri &amp; Ringan</h3>
+            <p>
+              Berjalan langsung di peramban dengan penyimpanan lokal aman, generator caption otomatis, serta integrasi berbagi instan tanpa ketergantungan pada perangkat lunak berat.
+            </p>
+          </article>
+        </div>
+
+        <div class="hud-metrics-bar">
+          <div class="hud-metric">
+            <strong>1440px</strong>
+            <span>ULTRA HD RENDER</span>
+          </div>
+          <div class="hud-metric-div" aria-hidden="true"></div>
+          <div class="hud-metric">
+            <strong>10 SLIDES</strong>
+            <span>MULTI-CAROUSEL ENGINE</span>
+          </div>
+          <div class="hud-metric-div" aria-hidden="true"></div>
+          <div class="hud-metric">
+            <strong>57 • 58</strong>
+            <span>CREATOR ARCHITECTURE</span>
+          </div>
+          <div class="hud-metric-cta">
+            <button type="button" class="btn-primary" id="btnAboutEnterStudio">Buka Studio Sekarang →</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- MODAL POP-UP LOGIN -->
     <div class="login-modal-backdrop hidden" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="modalLoginTitle">
@@ -120,15 +188,15 @@
       </div>
 
       <nav class="desktop-tabs" aria-label="Menu Utama">
-        <button type="button" class="tab-btn active" data-tab="editor"> Edit Konten</button>
-        <button type="button" class="tab-btn" data-tab="style"> Tema &amp; Logo</button>
-        <button type="button" class="tab-btn" data-tab="slides"> Urutan Slide</button>
-        <button type="button" class="tab-btn" data-tab="caption"> Caption &amp; Share</button>
+        <button type="button" class="tab-btn active" data-tab="editor">✏️ Edit Konten</button>
+        <button type="button" class="tab-btn" data-tab="style">🎨 Tema &amp; Logo</button>
+        <button type="button" class="tab-btn" data-tab="slides">📑 Urutan Slide</button>
+        <button type="button" class="tab-btn" data-tab="caption">📲 Caption &amp; Share</button>
       </nav>
 
       <div class="top-actions">
         <button type="button" class="btn-ghost" id="btnResetProject" title="Kembalikan ke awal">↺ Reset</button>
-        <button type="button" class="btn-ghost" id="btnLogout" title="Kunci layar">  Kunci</button>
+        <button type="button" class="btn-ghost" id="btnLogout" title="Kunci layar">🔒 Kunci</button>
         <button type="button" class="btn-primary" id="btnExportAll">Simpan Semua ↗</button>
       </div>
     </header>
@@ -242,7 +310,7 @@
                 <span class="kicker">2. ISI TEKS SLIDE</span>
                 <p class="helper-text">Blok kata di judul lalu klik tombol Sorot untuk mewarnainya</p>
               </div>
-              <button type="button" class="btn-chip-accent" id="btnHighlightSelection">Sorot Kata</button>
+              <button type="button" class="btn-chip-accent" id="btnHighlightSelection">✨ Sorot Kata</button>
             </div>
 
             <div class="row-2">
@@ -423,8 +491,8 @@
             </div>
 
             <div class="action-stack mt-12">
-              <button type="button" class="btn-secondary" id="btnCopyCaption">Salin Teks Caption</button>
-              <button type="button" class="btn-accent" id="btnShareAllIG">Kirim Semua Slide + Caption ke IG ↗</button>
+              <button type="button" class="btn-secondary" id="btnCopyCaption">📋 Salin Teks Caption</button>
+              <button type="button" class="btn-accent" id="btnShareAllIG">📲 Kirim Semua Slide + Caption ke IG ↗</button>
             </div>
           </div>
         </div>
@@ -433,16 +501,16 @@
 
     <!-- NAVIGASI BAWAH KHUSUS HP -->
     <nav class="mobile-nav" aria-label="Navigasi Ponsel">
-      <button type="button" class="mnav-btn active" data-mview="preview"><span></span>Hasil</button>
-      <button type="button" class="mnav-btn" data-mview="editor"><span></span>Edit</button>
-      <button type="button" class="mnav-btn" data-mview="style"><span></span>Tema</button>
-      <button type="button" class="mnav-btn" data-mview="slides"><span></span>Slide</button>
-      <button type="button" class="mnav-btn" data-mview="caption"><span></span>Post IG</button>
+      <button type="button" class="mnav-btn active" data-mview="preview"><span>🖼️</span>Hasil</button>
+      <button type="button" class="mnav-btn" data-mview="editor"><span>✏️</span>Edit</button>
+      <button type="button" class="mnav-btn" data-mview="style"><span>🎨</span>Tema</button>
+      <button type="button" class="mnav-btn" data-mview="slides"><span>📑</span>Slide</button>
+      <button type="button" class="mnav-btn" data-mview="caption"><span>📲</span>Post IG</button>
     </nav>
   </div>
 
   <div class="toast" id="toastBox" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';" />
-  <title>Sanis Studio — Instagram Microblog Generator</title>
+  <title>Sanis Studio — Editor Konten Instagram</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -13,26 +13,27 @@
     <div class="login-card">
       <div class="login-logo">SC</div>
       <h1 class="login-title">SANIS STUDIO</h1>
-      <p class="login-sub">SANIS CORO • 57 CREATOR 58</p>
+      <p class="login-sub">Studio Pembuat Carousel &amp; Microblog IG</p>
 
       <form id="loginForm" class="login-form" autocomplete="off">
         <div>
           <label class="field-label" for="loginUser">Username</label>
-          <input type="text" id="loginUser" class="input" placeholder="Masukkan username" required />
+          <input type="text" id="loginUser" class="input" placeholder="Ketik username..." required />
         </div>
         <div>
           <label class="field-label" for="loginPass">Password / PIN</label>
           <div class="pass-wrap">
-            <input type="password" id="loginPass" class="input" placeholder="Masukkan password" required />
-            <button type="button" class="toggle-pass" id="btnTogglePass" aria-label="Tampilkan Password">👁️</button>
+            <input type="password" id="loginPass" class="input" placeholder="Ketik PIN / password..." required />
+            <button type="button" class="toggle-pass" id="btnTogglePass" aria-label="Lihat Password">👁️</button>
           </div>
         </div>
         <div class="login-error" id="loginError" role="alert"></div>
-        <button type="submit" class="btn-light login-submit">MASUK KE STUDIO ↗</button>
+        <button type="submit" class="btn-primary login-submit">Masuk ke Studio →</button>
       </form>
 
       <div class="login-hint">
-        Default: <strong>saniscoro</strong> • PIN: <strong>5758</strong>
+        <span>Akun bawaan: <strong>saniscoro</strong> • PIN: <strong>5758</strong></span>
+        <button type="button" class="link-btn mt-6" id="btnQuickFill">Isi Otomatis Akun Bawaan</button>
       </div>
     </div>
   </section>
@@ -44,290 +45,329 @@
         <div class="brand-mark" aria-hidden="true">SC</div>
         <div>
           <div class="brand-title">SANIS STUDIO</div>
-          <div class="brand-sub"><span class="dot"></span> READY • 1440PX MASTER</div>
+          <div class="brand-sub"><span class="dot"></span> Siap Ekspor HD</div>
         </div>
       </div>
 
-      <nav class="desktop-tabs" aria-label="Menu Studio">
-        <button type="button" class="tab-btn" data-tab="style">01 GAYA &amp; BRAND</button>
-        <button type="button" class="tab-btn active" data-tab="editor">02 TEKS &amp; FOTO</button>
-        <button type="button" class="tab-btn" data-tab="slides">03 CAROUSEL</button>
-        <button type="button" class="tab-btn" data-tab="caption">04 CAPTION &amp; IG</button>
+      <nav class="desktop-tabs" aria-label="Menu Utama">
+        <button type="button" class="tab-btn active" data-tab="editor">✏️ Edit Konten</button>
+        <button type="button" class="tab-btn" data-tab="style">🎨 Tema &amp; Logo</button>
+        <button type="button" class="tab-btn" data-tab="slides">📑 Urutan Slide</button>
+        <button type="button" class="tab-btn" data-tab="caption">📲 Caption &amp; Share</button>
       </nav>
 
       <div class="top-actions">
-        <button type="button" class="btn-ghost" id="btnResetProject" title="Reset Proyek">↺ Reset</button>
-        <button type="button" class="btn-ghost" id="btnLogout" title="Kunci / Keluar">🔒 Keluar</button>
-        <button type="button" class="btn-light" id="btnExportAll">EXPORT ALL ↗</button>
+        <button type="button" class="btn-ghost" id="btnResetProject" title="Kembalikan ke awal">↺ Reset</button>
+        <button type="button" class="btn-ghost" id="btnLogout" title="Kunci layar">🔒 Kunci</button>
+        <button type="button" class="btn-primary" id="btnExportAll">Simpan Semua ↗</button>
       </div>
     </header>
 
     <main class="workspace">
+      <!-- AREA PRATINJAU KANVAS -->
       <section class="stage-panel active-mobile" id="mobilePreviewSection">
-        <div class="stage-hud">
+        <div class="stage-topbar">
+          <!-- Navigasi Slide Cepat -->
+          <div class="quick-slides" id="quickSlidePills" aria-label="Pilih Slide Cepat"></div>
+
+          <!-- Pengaturan Ukuran & Kualitas -->
           <div class="hud-group">
-            <button type="button" class="hud-btn" id="prevSlideBtn" aria-label="Slide Sebelumnya">◀</button>
-            <span class="hud-counter" id="slideCounter">1 / 3</span>
-            <button type="button" class="hud-btn" id="nextSlideBtn" aria-label="Slide Berikutnya">▶</button>
-          </div>
-          <div class="hud-group">
-            <button type="button" class="hud-btn" id="toggleRatioBtn">4:5 PORTRAIT</button>
-            <button type="button" class="hud-btn" id="toggleQualityBtn">1440PX HD</button>
+            <button type="button" class="hud-btn" id="toggleRatioBtn" title="Ganti Rasio IG">4:5</button>
+            <button type="button" class="hud-btn" id="toggleQualityBtn" title="Ganti Resolusi">HD 1440</button>
           </div>
         </div>
 
         <div class="canvas-frame" id="canvasTouchArea">
           <canvas id="previewCanvas" width="1080" height="1350"></canvas>
+          <div class="canvas-drag-badge" id="dragHintBadge">✋ Seret foto di layar untuk atur posisi</div>
         </div>
 
         <div class="stage-footer-actions">
-          <button type="button" class="btn-dark" id="btnDownloadCurrent">⬇ Unduh PNG Slide Ini</button>
-          <button type="button" class="btn-accent" id="btnShareIGCurrent">Post ke IG ↗</button>
+          <button type="button" class="btn-secondary" id="btnDownloadCurrent">⬇ Simpan PNG Ini</button>
+          <button type="button" class="btn-accent" id="btnShareIGCurrent">Bagikan ke IG ↗</button>
         </div>
       </section>
 
+      <!-- PANEL EDITOR -->
       <aside class="editor-panel" id="mobileEditorSection">
-        <!-- TAB 01 -->
-        <div class="tab-pane" id="pane-style">
-          <div class="bento-card">
-            <div class="kicker">ARSITEKTUR TEMPLATE</div>
-            <div class="template-grid" id="templateSelector">
-              <button type="button" class="tpl-card active" data-tpl="breaking">
-                <span class="tpl-icon">🔥</span>
-                <span class="tpl-name">Breaking Fade</span>
-              </button>
-              <button type="button" class="tpl-card" data-tpl="editorial">
-                <span class="tpl-icon">🏛️</span>
-                <span class="tpl-name">Editorial Studio</span>
-              </button>
-              <button type="button" class="tpl-card" data-tpl="fintech">
-                <span class="tpl-icon">🪙</span>
-                <span class="tpl-name">Fintech 3-Coin</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="bento-card">
-            <div class="kicker">PALET &amp; WARNA AKSEN</div>
-            <div class="row-2">
-              <div>
-                <label class="field-label">Mode Tema</label>
-                <select id="themeMode" class="input">
-                  <option value="dark">Matte Charcoal (#121215)</option>
-                  <option value="fresh">Hitam Putih Fresh</option>
-                </select>
-              </div>
-              <div>
-                <label class="field-label">Warna Sorotan [[...]]</label>
-                <div class="color-row">
-                  <input type="color" id="accentColor" value="#E11D2A" />
-                  <button type="button" class="chip-btn" data-color="#E11D2A" style="background:#E11D2A"></button>
-                  <button type="button" class="chip-btn" data-color="#22C55E" style="background:#22C55E"></button>
-                  <button type="button" class="chip-btn" data-color="#3B82F6" style="background:#3B82F6"></button>
-                  <button type="button" class="chip-btn" data-color="#F59E0B" style="background:#F59E0B"></button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="bento-card">
-            <div class="kicker">IDENTITAS LOGO &amp; HANDLE</div>
-            <div class="row-2">
-              <div>
-                <label class="field-label">Gaya Logo</label>
-                <select id="logoMode" class="input">
-                  <option value="sc_vector">SC SANIS CORO 57 CREATOR 58</option>
-                  <option value="monogram">Monogram + Kotak Aksen</option>
-                  <option value="custom">Upload Logo Kustom</option>
-                </select>
-              </div>
-              <div>
-                <label class="field-label">Teks Monogram</label>
-                <input type="text" id="brandMono" class="input" value="SC" maxlength="10" />
-              </div>
-            </div>
-            <div class="mt-10">
-              <label class="field-label">Kapsul Sosial Media / Footer</label>
-              <input type="text" id="socialHandle" class="input" value="Tiktok & IG | @saniscoro" />
-            </div>
-            <div class="mt-10 upload-inline">
-              <label class="btn-dark small-btn" for="logoUploadInput">📁 Upload Logo PNG</label>
-              <input type="file" id="logoUploadInput" accept="image/png,image/jpeg,image/webp" hidden />
-              <button type="button" class="btn-ghost small-btn" id="btnClearLogo">↺ Default SC</button>
-            </div>
-          </div>
-
-          <div class="bento-card">
-            <div class="kicker">KEAMANAN LOGIN STUDIO</div>
-            <div class="row-2">
-              <div>
-                <label class="field-label">Username Baru</label>
-                <input type="text" id="newAuthUser" class="input" placeholder="saniscoro" />
-              </div>
-              <div>
-                <label class="field-label">Password / PIN Baru</label>
-                <input type="password" id="newAuthPass" class="input" placeholder="Minimal 4 karakter" />
-              </div>
-            </div>
-            <button type="button" class="btn-dark mt-10" id="btnSaveAuth" style="width:100%">Simpan Akun Login</button>
-          </div>
-        </div>
-
-        <!-- TAB 02 -->
+        <!-- TAB 1: EDIT KONTEN (TEKS & FOTO) -->
         <div class="tab-pane active" id="pane-editor">
           <div class="bento-card">
             <div class="card-head-row">
-              <span class="kicker">BACKGROUND &amp; GRADASI SLIDE</span>
-              <button type="button" class="link-btn" id="btnApplyBgAll">Terapkan ke Semua</button>
+              <div>
+                <span class="kicker">1. FOTO &amp; LATAR BELAKANG</span>
+                <p class="helper-text">Unggah foto lalu geser langsung di kanvas pratinjau</p>
+              </div>
+              <button type="button" class="link-btn" id="btnApplyBgAll">Samakan Semua Slide</button>
             </div>
 
             <div class="drop-zone" id="bgDropZone">
               <div class="drop-preview" id="bgThumbWrap">
                 <img id="bgThumbImg" alt="Preview Background" />
-                <span id="bgPlaceholderText">Klik Upload, Seret Foto, atau Paste (Ctrl+V)</span>
+                <span id="bgPlaceholderText">📷 Pilih foto dari galeri atau tempel gambar (Ctrl+V)</span>
               </div>
               <div class="drop-actions">
-                <label class="btn-light small-btn" for="bgFileInput">📷 Upload Foto</label>
+                <label class="btn-primary small-btn" for="bgFileInput">Pilih Foto</label>
                 <input type="file" id="bgFileInput" accept="image/png,image/jpeg,image/webp,image/gif" hidden />
-                <button type="button" class="btn-ghost small-btn" id="btnRemoveBg">Hapus</button>
+                <button type="button" class="btn-ghost small-btn" id="btnRemoveBg">Hapus Foto</button>
               </div>
             </div>
 
-            <div class="preset-row">
-              <button type="button" class="preset-btn" data-preset="fire">🔥 Crypto Fire</button>
-              <button type="button" class="preset-btn" data-preset="bullish">📈 Bullish</button>
-              <button type="button" class="preset-btn" data-preset="cyber">🌐 Cyber Blue</button>
-              <button type="button" class="preset-btn" data-preset="clean">⬜ Studio Grid</button>
+            <div class="mt-12">
+              <label class="field-label">Atau Pilih Warna Latar Instan:</label>
+              <div class="preset-row">
+                <button type="button" class="preset-btn" data-preset="fire">🔥 Merah Api</button>
+                <button type="button" class="preset-btn" data-preset="bullish">📈 Hijau Bullish</button>
+                <button type="button" class="preset-btn" data-preset="cyber">🌐 Biru Cyber</button>
+                <button type="button" class="preset-btn" data-preset="clean">⬜ Polos Studio</button>
+              </div>
             </div>
 
-            <div class="slider-grid">
-              <div>
-                <label class="field-label">Titik Mulai Hitam: <span id="valFadeStart">42%</span></label>
-                <input type="range" id="fadeStart" min="15" max="80" value="42" />
+            <details class="friendly-details mt-12" open>
+              <summary>🎛️ Atur Posisi Foto &amp; Gradasi Gelap</summary>
+              <div class="details-body">
+                <div class="slider-stack">
+                  <div class="slider-item">
+                    <div class="slider-head">
+                      <span>Geser Kiri / Kanan (X)</span>
+                      <strong id="valImgX">0%</strong>
+                    </div>
+                    <input type="range" id="imgOffsetX" min="-40" max="40" value="0" />
+                  </div>
+                  <div class="slider-item">
+                    <div class="slider-head">
+                      <span>Geser Atas / Bawah (Y)</span>
+                      <strong id="valImgY">0%</strong>
+                    </div>
+                    <input type="range" id="imgOffsetY" min="-40" max="40" value="0" />
+                  </div>
+                  <div class="slider-item">
+                    <div class="slider-head">
+                      <span>Perbesar / Perkecil Foto</span>
+                      <strong id="valImgZoom">100%</strong>
+                    </div>
+                    <input type="range" id="imgZoom" min="80" max="160" value="100" />
+                  </div>
+                  <div class="slider-item">
+                    <div class="slider-head">
+                      <span>Batas Atas Gradasi Teks</span>
+                      <strong id="valFadeStart">42%</strong>
+                    </div>
+                    <input type="range" id="fadeStart" min="15" max="80" value="42" />
+                  </div>
+                  <div class="slider-item">
+                    <div class="slider-head">
+                      <span>Kepekatan Gradasi</span>
+                      <strong id="valFadeOpacity">100%</strong>
+                    </div>
+                    <input type="range" id="fadeOpacity" min="0" max="100" value="100" />
+                  </div>
+                </div>
+                <button type="button" class="btn-secondary small-btn mt-10" id="btnResetImgPos" style="width:100%">↺ Kembalikan Posisi Foto ke Tengah</button>
               </div>
-              <div>
-                <label class="field-label">Kepekatan Gradasi: <span id="valFadeOpacity">100%</span></label>
-                <input type="range" id="fadeOpacity" min="0" max="100" value="100" />
-              </div>
-              <div>
-                <label class="field-label">Geser Foto (X): <span id="valImgX">0%</span></label>
-                <input type="range" id="imgOffsetX" min="-40" max="40" value="0" />
-              </div>
-              <div>
-                <label class="field-label">Geser Foto (Y): <span id="valImgY">0%</span></label>
-                <input type="range" id="imgOffsetY" min="-40" max="40" value="0" />
-              </div>
-              <div>
-                <label class="field-label">Zoom Foto: <span id="valImgZoom">100%</span></label>
-                <input type="range" id="imgZoom" min="80" max="160" value="100" />
-              </div>
-              <div style="display:flex;align-items:flex-end;">
-                <button type="button" class="btn-ghost small-btn" id="btnResetImgPos" style="width:100%">↺ Tengah Foto</button>
-              </div>
-            </div>
+            </details>
           </div>
 
           <div class="bento-card">
             <div class="card-head-row">
-              <span class="kicker">TEKS UTAMA &amp; SOROTAN</span>
-              <button type="button" class="link-btn" id="btnHighlightSelection">✨ Sorot [[Teks]]</button>
+              <div>
+                <span class="kicker">2. ISI TEKS SLIDE</span>
+                <p class="helper-text">Blok kata di judul lalu klik tombol Sorot untuk mewarnainya</p>
+              </div>
+              <button type="button" class="btn-chip-accent" id="btnHighlightSelection">✨ Sorot Kata</button>
             </div>
 
             <div class="row-2">
               <div>
-                <label class="field-label">Jenis Slide</label>
+                <label class="field-label">Tipe Halaman</label>
                 <select id="slideType" class="input">
-                  <option value="cover">Cover Utama</option>
-                  <option value="content">Slide Isi / Poin</option>
-                  <option value="closing">Penutup / CTA</option>
+                  <option value="cover">Cover Depan</option>
+                  <option value="content">Isi / Penjelasan</option>
+                  <option value="closing">Penutup / Ajakan</option>
                 </select>
               </div>
               <div>
-                <label class="field-label">Kicker / Kategori</label>
-                <input type="text" id="slideKicker" class="input" placeholder="BREAKING NEWS" />
+                <label class="field-label">Label Kecil Atas</label>
+                <input type="text" id="slideKicker" class="input" placeholder="Contoh: MARKET ALERT" />
               </div>
             </div>
 
-            <div class="mt-10">
-              <label class="field-label">Judul Utama (Gunakan [[kata]] untuk warna aksen)</label>
-              <textarea id="slideTitle" class="input textarea" rows="3"></textarea>
+            <div class="mt-12">
+              <label class="field-label">Judul Utama</label>
+              <textarea id="slideTitle" class="input textarea" rows="3" placeholder="Tulis judul menarik di sini..."></textarea>
             </div>
 
-            <div class="mt-10">
-              <label class="field-label">Subjudul / Ringkasan</label>
-              <textarea id="slideSubtitle" class="input textarea" rows="2"></textarea>
+            <div class="mt-12">
+              <label class="field-label">Penjelasan Singkat</label>
+              <textarea id="slideSubtitle" class="input textarea" rows="2" placeholder="Ringkasan pendukung judul..."></textarea>
             </div>
 
-            <div class="mt-10">
+            <div class="mt-12">
               <div class="card-head-row">
-                <label class="field-label">Daftar Poin Pembahasan</label>
+                <label class="field-label">Poin-Poin Utama</label>
                 <button type="button" class="link-btn" id="btnAddBullet">+ Tambah Poin</button>
               </div>
               <div id="bulletsContainer" class="bullets-list"></div>
             </div>
 
-            <div class="mt-10">
-              <label class="field-label">Kutipan / Catatan Sumber (Opsional)</label>
-              <input type="text" id="slideQuote" class="input" placeholder="Sumber: Analisis Pasar & On-Chain" />
+            <div class="mt-12">
+              <label class="field-label">Catatan Kaki / Sumber</label>
+              <input type="text" id="slideQuote" class="input" placeholder="Contoh: Sumber: Data Pasar" />
             </div>
           </div>
         </div>
 
-        <!-- TAB 03 -->
+        <!-- TAB 2: TEMA & LOGO -->
+        <div class="tab-pane" id="pane-style">
+          <div class="bento-card">
+            <span class="kicker">PILIH MODEL DESAIN</span>
+            <div class="template-grid" id="templateSelector">
+              <button type="button" class="tpl-card active" data-tpl="breaking">
+                <span class="tpl-icon">🔥</span>
+                <span class="tpl-name">Breaking News</span>
+                <span class="tpl-desc">Judul besar di bawah</span>
+              </button>
+              <button type="button" class="tpl-card" data-tpl="editorial">
+                <span class="tpl-icon">🏛️</span>
+                <span class="tpl-name">Editorial</span>
+                <span class="tpl-desc">Rata kiri bersih</span>
+              </button>
+              <button type="button" class="tpl-card" data-tpl="fintech">
+                <span class="tpl-icon">🃏</span>
+                <span class="tpl-name">Kartu Poin</span>
+                <span class="tpl-desc">Kotak informasi rapi</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="bento-card">
+            <span class="kicker">WARNA TEMA &amp; SOROTAN</span>
+            <div class="row-2">
+              <div>
+                <label class="field-label">Latar Kanvas</label>
+                <select id="themeMode" class="input">
+                  <option value="dark">Gelap Elegan (Charcoal)</option>
+                  <option value="fresh">Putih Bersih (Light)</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Warna Sorotan Teks</label>
+                <div class="color-row">
+                  <input type="color" id="accentColor" value="#E11D2A" aria-label="Pilih warna kustom" />
+                  <button type="button" class="chip-btn" data-color="#E11D2A" style="background:#E11D2A" title="Merah"></button>
+                  <button type="button" class="chip-btn" data-color="#22C55E" style="background:#22C55E" title="Hijau"></button>
+                  <button type="button" class="chip-btn" data-color="#3B82F6" style="background:#3B82F6" title="Biru"></button>
+                  <button type="button" class="chip-btn" data-color="#F59E0B" style="background:#F59E0B" title="Kuning Emas"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bento-card">
+            <span class="kicker">LOGO &amp; NAMA AKUN</span>
+            <div class="row-2">
+              <div>
+                <label class="field-label">Tampilan Logo</label>
+                <select id="logoMode" class="input">
+                  <option value="sc_vector">Logo SC Sanis Coro</option>
+                  <option value="monogram">Inisial Huruf + Kotak</option>
+                  <option value="custom">Gambar Logo Sendiri</option>
+                </select>
+              </div>
+              <div>
+                <label class="field-label">Inisial Huruf</label>
+                <input type="text" id="brandMono" class="input" value="SC" maxlength="10" />
+              </div>
+            </div>
+            <div class="mt-12">
+              <label class="field-label">Teks Akun di Pojok Bawah</label>
+              <input type="text" id="socialHandle" class="input" value="Tiktok & IG | @saniscoro" />
+            </div>
+            <div class="mt-12 upload-inline">
+              <label class="btn-secondary small-btn" for="logoUploadInput">📁 Unggah Logo</label>
+              <input type="file" id="logoUploadInput" accept="image/png,image/jpeg,image/webp" hidden />
+              <button type="button" class="btn-ghost small-btn" id="btnClearLogo">↺ Pakai Logo SC</button>
+            </div>
+          </div>
+
+          <div class="bento-card">
+            <span class="kicker">GANTI USERNAME &amp; PIN LOGIN</span>
+            <div class="row-2">
+              <div>
+                <label class="field-label">Username</label>
+                <input type="text" id="newAuthUser" class="input" placeholder="saniscoro" />
+              </div>
+              <div>
+                <label class="field-label">PIN / Password Baru</label>
+                <input type="password" id="newAuthPass" class="input" placeholder="Min. 4 karakter" />
+              </div>
+            </div>
+            <button type="button" class="btn-secondary mt-12" id="btnSaveAuth" style="width:100%">Simpan Perubahan Login</button>
+          </div>
+        </div>
+
+        <!-- TAB 3: URUTAN SLIDE -->
         <div class="tab-pane" id="pane-slides">
           <div class="bento-card">
             <div class="card-head-row">
-              <span class="kicker">DAFTAR SLIDE (MAKS 10)</span>
-              <button type="button" class="btn-light small-btn" id="btnAddSlide">+ Slide Baru</button>
+              <div>
+                <span class="kicker">KELOLA SLIDE CAROUSEL</span>
+                <p class="helper-text">Ketuk slide untuk mengedit, atau atur urutannya</p>
+              </div>
+              <button type="button" class="btn-primary small-btn" id="btnAddSlide">+ Tambah Slide</button>
             </div>
-            <div id="slideListContainer" class="slide-cards"></div>
+            <div id="slideListContainer" class="slide-cards mt-10"></div>
           </div>
         </div>
 
-        <!-- TAB 04 -->
+        <!-- TAB 4: CAPTION & SHARE -->
         <div class="tab-pane" id="pane-caption">
           <div class="bento-card">
             <div class="card-head-row">
-              <span class="kicker">CAPTION &amp; HASHTAG OTOMATIS</span>
-              <button type="button" class="link-btn" id="btnRegenCaption">↻ Buat Ulang</button>
+              <div>
+                <span class="kicker">CAPTION SIAP POSTING</span>
+                <p class="helper-text">Otomatis dirangkum dari seluruh isi slide Anda</p>
+              </div>
+              <button type="button" class="link-btn" id="btnRegenCaption">↻ Susun Ulang</button>
             </div>
 
             <div class="row-2">
               <div>
-                <label class="field-label">Gaya Penulisan</label>
+                <label class="field-label">Gaya Bahasa</label>
                 <select id="captionTone" class="input">
-                  <option value="breaking">Breaking News (Tegas)</option>
-                  <option value="analysis">Edukasi &amp; Analisis</option>
-                  <option value="punchy">Singkat &amp; Punchy</option>
+                  <option value="breaking">Berita Tegas (Breaking)</option>
+                  <option value="analysis">Edukasi &amp; Rincian</option>
+                  <option value="punchy">Singkat &amp; Padat</option>
                 </select>
               </div>
               <div>
-                <label class="field-label">Elemen Tambahan</label>
+                <label class="field-label">Kelengkapan</label>
                 <div class="toggle-pills">
                   <button type="button" class="pill-toggle active" id="togEmoji">Emoji</button>
-                  <button type="button" class="pill-toggle active" id="togCta">CTA</button>
-                  <button type="button" class="pill-toggle active" id="togTags">#Tag</button>
+                  <button type="button" class="pill-toggle active" id="togCta">Ajakan</button>
+                  <button type="button" class="pill-toggle active" id="togTags">Hashtag</button>
                 </div>
               </div>
             </div>
 
-            <div class="mt-10">
+            <div class="mt-12">
               <textarea id="captionOutput" class="input textarea caption-box" rows="9"></textarea>
             </div>
 
-            <div class="action-stack mt-10">
-              <button type="button" class="btn-dark" id="btnCopyCaption">📋 Salin Caption ke Clipboard</button>
-              <button type="button" class="btn-accent" id="btnShareAllIG">📲 Post Semua Slide + Caption ke IG ↗</button>
+            <div class="action-stack mt-12">
+              <button type="button" class="btn-secondary" id="btnCopyCaption">📋 Salin Teks Caption</button>
+              <button type="button" class="btn-accent" id="btnShareAllIG">📲 Kirim Semua Slide + Caption ke IG ↗</button>
             </div>
           </div>
         </div>
       </aside>
     </main>
 
+    <!-- NAVIGASI BAWAH KHUSUS HP -->
     <nav class="mobile-nav" aria-label="Navigasi Ponsel">
-      <button type="button" class="mnav-btn active" data-mview="preview"><span>🖼️</span>Pratinjau</button>
-      <button type="button" class="mnav-btn" data-mview="style"><span>🎨</span>Gaya</button>
-      <button type="button" class="mnav-btn" data-mview="editor"><span>✏️</span>Teks &amp; Foto</button>
+      <button type="button" class="mnav-btn active" data-mview="preview"><span>🖼️</span>Hasil</button>
+      <button type="button" class="mnav-btn" data-mview="editor"><span>✏️</span>Edit</button>
+      <button type="button" class="mnav-btn" data-mview="style"><span>🎨</span>Tema</button>
       <button type="button" class="mnav-btn" data-mview="slides"><span>📑</span>Slide</button>
       <button type="button" class="mnav-btn" data-mview="caption"><span>📲</span>Post IG</button>
     </nav>

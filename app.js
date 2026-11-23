@@ -7,7 +7,10 @@
   const SAFE_MIME = /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=]+$/i;
   const imgCache = new Map();
 
-  const 
+  const DEFAULT_STATE = {
+    template: "breaking",
+    themeMode: "dark",
+    accentColor: "#E11D2A",
     ratio: "4:5",
     exportWidth: 1440,
     logoMode: "sc_vector",
@@ -120,6 +123,12 @@
       unlockStudio();
     }
 
+    document.getElementById("btnQuickFill").onclick = () => {
+      document.getElementById("loginUser").value = "saniscoro";
+      document.getElementById("loginPass").value = "5758";
+      document.getElementById("loginError").textContent = "";
+    };
+
     document.getElementById("btnTogglePass").onclick = () => {
       const inp = document.getElementById("loginPass");
       inp.type = inp.type === "password" ? "text" : "password";
@@ -147,7 +156,7 @@
         sessionStorage.setItem(SESSION_KEY, "1");
         errBox.textContent = "";
         unlockStudio();
-        showToast(`Selamat datang, ${current.user}!`);
+        showToast(`Halo, ${current.user}! Studio siap digunakan.`);
       } else {
         failCount++;
         if (failCount >= 5) {
@@ -155,25 +164,25 @@
           failCount = 0;
           errBox.textContent = "Salah 5 kali. Tunggu 15 detik sebelum mencoba lagi.";
         } else {
-          errBox.textContent = "Username atau Password/PIN salah.";
+          errBox.textContent = "Username atau PIN salah. Coba periksa kembali.";
         }
       }
     };
 
     document.getElementById("btnLogout").onclick = () => {
       lockStudio();
-      showToast("Sesi dikunci.");
+      showToast("Layar studio dikunci.");
     };
 
     document.getElementById("btnSaveAuth").onclick = async () => {
       const newU = document.getElementById("newAuthUser").value.trim();
       const newP = document.getElementById("newAuthPass").value;
       if (newU.length < 3) return showToast("Username minimal 3 karakter");
-      if (newP.length < 4) return showToast("Password/PIN minimal 4 karakter");
+      if (newP.length < 4) return showToast("PIN / Password minimal 4 karakter");
       const passHash = await hashText(newP);
       localStorage.setItem(AUTH_KEY, JSON.stringify({ user: newU, passHash }));
       document.getElementById("newAuthPass").value = "";
-      showToast("Username & Password login diperbarui!");
+      showToast("Akun login berhasil diperbarui!");
     };
   }
 
@@ -740,11 +749,36 @@
     document.getElementById("valImgZoom").textContent = `${sl.imgZoom || 100}%`;
   }
 
+  function renderQuickSlidePills() {
+    const wrap = document.getElementById("quickSlidePills");
+    wrap.innerHTML = "";
+    state.slides.forEach((_, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `qslide-pill ${idx === state.activeSlide ? "active" : ""}`;
+      btn.textContent = String(idx + 1);
+      btn.title = `Buka Slide ${idx + 1}`;
+      btn.onclick = () => {
+        state.activeSlide = idx;
+        syncFormFromState();
+      };
+      wrap.appendChild(btn);
+    });
+    if (state.slides.length < 10) {
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "qslide-pill add-pill";
+      addBtn.textContent = "+";
+      addBtn.title = "Tambah Slide Baru";
+      addBtn.onclick = addNewSlide;
+      wrap.appendChild(addBtn);
+    }
+  }
+
   function syncFormFromState() {
     const sl = state.slides[state.activeSlide];
-    document.getElementById("slideCounter").textContent = `${state.activeSlide + 1} / ${state.slides.length}`;
-    document.getElementById("toggleRatioBtn").textContent = state.ratio === "4:5" ? "4:5 PORTRAIT" : "1:1 SQUARE";
-    document.getElementById("toggleQualityBtn").textContent = `${state.exportWidth}PX HD`;
+    document.getElementById("toggleRatioBtn").textContent = state.ratio === "4:5" ? "4:5" : "1:1";
+    document.getElementById("toggleQualityBtn").textContent = `HD ${state.exportWidth}`;
 
     document.querySelectorAll(".tpl-card").forEach(b => b.classList.toggle("active", b.dataset.tpl === state.template));
     document.getElementById("themeMode").value = state.themeMode;
@@ -763,15 +797,19 @@
 
     const thumb = document.getElementById("bgThumbImg");
     const ph = document.getElementById("bgPlaceholderText");
+    const dragBadge = document.getElementById("dragHintBadge");
     if (sl.bgImage) {
       thumb.src = sl.bgImage;
       thumb.style.display = "block";
       ph.style.display = "none";
+      dragBadge.classList.add("visible");
     } else {
       thumb.style.display = "none";
       ph.style.display = "block";
+      dragBadge.classList.remove("visible");
     }
 
+    renderQuickSlidePills();
     renderBulletsList();
     renderSlideCards();
     requestRender();
@@ -788,6 +826,7 @@
       inp.type = "text";
       inp.className = "input";
       inp.value = txt;
+      inp.placeholder = `Poin ke-${idx + 1}`;
       inp.oninput = () => {
         sl.bullets[idx] = inp.value;
         requestRender();
@@ -797,6 +836,7 @@
       del.type = "button";
       del.className = "bullet-del";
       del.textContent = "×";
+      del.title = "Hapus poin";
       del.onclick = () => {
         sl.bullets.splice(idx, 1);
         syncFormFromState();
@@ -834,6 +874,7 @@
       up.type = "button";
       up.className = "mini-icon-btn";
       up.textContent = "↑";
+      up.title = "Geser ke atas";
       up.onclick = () => {
         if (idx === 0) return;
         [state.slides[idx - 1], state.slides[idx]] = [state.slides[idx], state.slides[idx - 1]];
@@ -844,6 +885,7 @@
       del.type = "button";
       del.className = "mini-icon-btn";
       del.textContent = "🗑";
+      del.title = "Hapus slide";
       del.onclick = () => {
         if (state.slides.length <= 1) return showToast("Minimal harus ada 1 slide");
         state.slides.splice(idx, 1);
@@ -854,6 +896,29 @@
       item.append(info, btns);
       box.appendChild(item);
     });
+  }
+
+  function addNewSlide() {
+    if (state.slides.length >= 10) return showToast("Maksimal 10 slide carousel");
+    state.slides.push({
+      type: "content",
+      kicker: "UPDATE TERBARU",
+      title: "JUDUL SLIDE BARU DENGAN [[KATA SOROTAN]]",
+      subtitle: "Tambahkan penjelasan singkat yang padat dan mudah dibaca.",
+      bullets: ["Poin utama pertama", "Poin utama kedua"],
+      quote: "Sumber: Sanis Coro Studio",
+      bgImage: "",
+      preset: "cyber",
+      fadeStart: 40,
+      fadeOpacity: 100,
+      imgOffsetX: 0,
+      imgOffsetY: 0,
+      imgZoom: 100
+    });
+    state.activeSlide = state.slides.length - 1;
+    syncFormFromState();
+    scheduleSave();
+    showToast(`Slide ${state.slides.length} ditambahkan`);
   }
 
   function bindEvents() {
@@ -897,6 +962,7 @@
       if (!rect.width || !rect.height) return;
       canvas.setPointerCapture(e.pointerId);
       canvas.classList.add("dragging");
+      document.getElementById("dragHintBadge").classList.remove("visible");
       dragState = {
         pointerId: e.pointerId,
         startX: e.clientX,
@@ -948,19 +1014,15 @@
       }
     }, { passive: true });
 
-    document.getElementById("prevSlideBtn").onclick = () => {
-      if (state.activeSlide > 0) { state.activeSlide--; syncFormFromState(); }
-    };
-    document.getElementById("nextSlideBtn").onclick = () => {
-      if (state.activeSlide < state.slides.length - 1) { state.activeSlide++; syncFormFromState(); }
-    };
     document.getElementById("toggleRatioBtn").onclick = () => {
       state.ratio = state.ratio === "4:5" ? "1:1" : "4:5";
       syncFormFromState(); scheduleSave();
+      showToast(`Ukuran kanvas: ${state.ratio}`);
     };
     document.getElementById("toggleQualityBtn").onclick = () => {
       state.exportWidth = state.exportWidth === 1440 ? 1080 : 1440;
       syncFormFromState(); scheduleSave();
+      showToast(`Resolusi ekspor: ${state.exportWidth}px`);
     };
 
     document.querySelectorAll(".tpl-card").forEach(card => {
@@ -983,8 +1045,8 @@
         state.customLogo = await compressImageFile(file, 600);
         state.logoMode = "custom";
         syncFormFromState(); scheduleSave();
-        showToast("Logo berhasil diunggah!");
-      } catch (_) { showToast("Gagal memproses logo"); }
+        showToast("Logo berhasil dipasang!");
+      } catch (_) { showToast("Gagal memproses file logo"); }
     };
     document.getElementById("btnClearLogo").onclick = () => {
       state.customLogo = ""; state.logoMode = "sc_vector"; syncFormFromState(); scheduleSave();
@@ -999,7 +1061,7 @@
         sl.imgOffsetY = 0;
         sl.imgZoom = 100;
         syncFormFromState(); scheduleSave();
-        showToast("Background diperbarui! Geser foto langsung di kanvas.");
+        showToast("Foto terpasang! Silakan geser posisi di kanvas.");
       } catch (_) { showToast("Format gambar tidak didukung"); }
     };
     document.getElementById("bgFileInput").onchange = e => {
@@ -1027,7 +1089,7 @@
         s.imgOffsetY = cur.imgOffsetY || 0;
         s.imgZoom = cur.imgZoom || 100;
       });
-      scheduleSave(); showToast("Background & posisi diterapkan ke semua slide!");
+      scheduleSave(); showToast("Latar & posisi foto disamakan ke semua slide!");
     };
     document.querySelectorAll(".preset-btn").forEach(btn => {
       btn.onclick = () => {
@@ -1059,7 +1121,7 @@
       syncSliderLabels(sl);
       requestRender();
       scheduleSave();
-      showToast("Posisi foto dikembalikan ke tengah");
+      showToast("Posisi foto kembali ke tengah");
     };
 
     document.getElementById("slideType").onchange = e => { state.slides[state.activeSlide].type = e.target.value; requestRender(); scheduleSave(); };
@@ -1071,7 +1133,7 @@
     document.getElementById("btnHighlightSelection").onclick = () => {
       const ta = document.getElementById("slideTitle");
       const start = ta.selectionStart, end = ta.selectionEnd;
-      if (start === end) return showToast("Blok dulu kata di judul yang ingin disorot");
+      if (start === end) return showToast("Blok dulu kata di kotak Judul Utama");
       const selected = ta.value.slice(start, end);
       ta.value = ta.value.slice(0, start) + `[[${selected}]]` + ta.value.slice(end);
       state.slides[state.activeSlide].title = ta.value;
@@ -1085,26 +1147,7 @@
       syncFormFromState(); scheduleSave();
     };
 
-    document.getElementById("btnAddSlide").onclick = () => {
-      if (state.slides.length >= 10) return showToast("Maksimal 10 slide carousel");
-      state.slides.push({
-        type: "content",
-        kicker: "UPDATE TERBARU",
-        title: "JUDUL SLIDE BARU DENGAN [[KATA SOROTAN]]",
-        subtitle: "Tambahkan penjelasan singkat yang padat dan mudah dibaca.",
-        bullets: ["Poin utama pertama", "Poin utama kedua"],
-        quote: "Sumber: Sanis Coro Studio",
-        bgImage: "",
-        preset: "cyber",
-        fadeStart: 40,
-        fadeOpacity: 100,
-        imgOffsetX: 0,
-        imgOffsetY: 0,
-        imgZoom: 100
-      });
-      state.activeSlide = state.slides.length - 1;
-      syncFormFromState(); scheduleSave();
-    };
+    document.getElementById("btnAddSlide").onclick = addNewSlide;
 
     document.getElementById("captionTone").onchange = e => { state.captionTone = e.target.value; generateAutoCaption(); scheduleSave(); };
     const bindPill = (id, prop) => {
@@ -1119,14 +1162,14 @@
     document.getElementById("btnCopyCaption").onclick = async () => {
       try {
         await navigator.clipboard.writeText(document.getElementById("captionOutput").value);
-        showToast("Caption disalin ke clipboard!");
-      } catch (_) { showToast("Pilih teks caption lalu salin manual"); }
+        showToast("Teks caption berhasil disalin!");
+      } catch (_) { showToast("Silakan salin teks secara manual"); }
     };
 
     document.getElementById("btnDownloadCurrent").onclick = () => downloadSlide(state.activeSlide);
     document.getElementById("btnExportAll").onclick = async () => {
       for (let i = 0; i < state.slides.length; i++) await downloadSlide(i);
-      showToast(`${state.slides.length} slide PNG (${state.exportWidth}px) diunduh!`);
+      showToast(`${state.slides.length} slide PNG berhasil disimpan!`);
     };
     document.getElementById("btnShareIGCurrent").onclick = () => shareToInstagram(false);
     document.getElementById("btnShareAllIG").onclick = () => shareToInstagram(true);

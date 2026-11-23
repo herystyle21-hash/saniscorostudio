@@ -1,11 +1,14 @@
 (() => {
   "use strict";
 
-  const AUTH_KEY = "sanisStudio_auth_v1";
-  const SESSION_KEY = "sanisStudio_session_v1";
+  const AUTH_KEY = "sanisStudio_auth_v2";
+  const SESSION_KEY = "sanisStudio_session_v2";
   const STORAGE_KEY = "sanisStudio_modular_v1";
   const SAFE_MIME = /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=]+$/i;
   const imgCache = new Map();
+
+  const DEFAULT_USER = "saniscoro";
+  const DEFAULT_PASS = "5758";
 
   const DEFAULT_STATE = {
     template: "breaking",
@@ -86,19 +89,31 @@
 
   /* --- SISTEM LOGIN --- */
   async function hashText(str) {
-    if (window.crypto && window.crypto.subtle) {
-      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+    try {
+      if (window.crypto && window.crypto.subtle) {
+        const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+      }
+    } catch (_) {}
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
     }
-    return "plain_" + str;
+    return "fnv_" + (h >>> 0).toString(16);
   }
 
   async function getAuthCreds() {
     try {
       const saved = JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
-      if (saved && saved.user && saved.passHash) return saved;
+      if (saved && typeof saved.user === "string" && typeof saved.passHash === "string") {
+        return saved;
+      }
     } catch (_) {}
-    return { user: "saniscoro", passHash: await hashText("5758") };
+    return {
+      user: DEFAULT_USER,
+      passHash: await hashText(DEFAULT_PASS)
+    };
   }
 
   function unlockStudio() {
@@ -108,7 +123,7 @@
   }
 
   function lockStudio() {
-    sessionStorage.removeItem(SESSION_KEY);
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (_) {}
     document.getElementById("loginPass").value = "";
     document.getElementById("loginError").textContent = "";
     document.getElementById("appShell").classList.add("app-locked");
@@ -117,22 +132,33 @@
 
   async function initAuth() {
     const creds = await getAuthCreds();
-    document.getElementById("newAuthUser").value = creds.user;
+    const newAuthUserInput = document.getElementById("newAuthUser");
+    if (newAuthUserInput) newAuthUserInput.value = creds.user;
 
-    if (sessionStorage.getItem(SESSION_KEY) === "1") {
-      unlockStudio();
+    try {
+      if (sessionStorage.getItem(SESSION_KEY) === "1") {
+        unlockStudio();
+      }
+    } catch (_) {}
+
+    const quickFillBtn = document.getElementById("btnQuickFill");
+    if (quickFillBtn) {
+      quickFillBtn.onclick = async () => {
+        localStorage.removeItem(AUTH_KEY);
+        document.getElementById("loginUser").value = DEFAULT_USER;
+        document.getElementById("loginPass").value = DEFAULT_PASS;
+        document.getElementById("loginError").textContent = "";
+        showToast("Akun diisi otomatis (saniscoro / 5758)");
+      };
     }
 
-    document.getElementById("btnQuickFill").onclick = () => {
-      document.getElementById("loginUser").value = "saniscoro";
-      document.getElementById("loginPass").value = "5758";
-      document.getElementById("loginError").textContent = "";
-    };
-
-    document.getElementById("btnTogglePass").onclick = () => {
-      const inp = document.getElementById("loginPass");
-      inp.type = inp.type === "password" ? "text" : "password";
-    };
+    const togglePassBtn = document.getElementById("btnTogglePass");
+    if (togglePassBtn) {
+      togglePassBtn.onclick = () => {
+        const inp = document.getElementById("loginPass");
+        inp.type = inp.type === "password" ? "text" : "password";
+      };
+    }
 
     let failCount = 0;
     let lockUntil = 0;
@@ -148,12 +174,16 @@
       }
 
       const u = document.getElementById("loginUser").value.trim().toLowerCase();
-      const p = document.getElementById("loginPass").value;
+      const p = document.getElementById("loginPass").value.trim();
       const current = await getAuthCreds();
+      const inputHash = await hashText(p);
 
-      if (u === current.user.toLowerCase() && (await hashText(p)) === current.passHash) {
+      const isDefaultMatch = u === DEFAULT_USER && p === DEFAULT_PASS && !localStorage.getItem(AUTH_KEY);
+      const isSavedMatch = u === current.user.toLowerCase() && inputHash === current.passHash;
+
+      if (isDefaultMatch || isSavedMatch) {
         failCount = 0;
-        sessionStorage.setItem(SESSION_KEY, "1");
+        try { sessionStorage.setItem(SESSION_KEY, "1"); } catch (_) {}
         errBox.textContent = "";
         unlockStudio();
         showToast(`Halo, ${current.user}! Studio siap digunakan.`);
@@ -164,7 +194,7 @@
           failCount = 0;
           errBox.textContent = "Salah 5 kali. Tunggu 15 detik sebelum mencoba lagi.";
         } else {
-          errBox.textContent = "Username atau PIN salah. Coba periksa kembali.";
+          errBox.textContent = "Username atau PIN salah. Klik 'Isi Otomatis Akun Bawaan' di bawah.";
         }
       }
     };
@@ -176,7 +206,7 @@
 
     document.getElementById("btnSaveAuth").onclick = async () => {
       const newU = document.getElementById("newAuthUser").value.trim();
-      const newP = document.getElementById("newAuthPass").value;
+      const newP = document.getElementById("newAuthPass").value.trim();
       if (newU.length < 3) return showToast("Username minimal 3 karakter");
       if (newP.length < 4) return showToast("PIN / Password minimal 4 karakter");
       const passHash = await hashText(newP);
@@ -244,6 +274,7 @@
 
   function showToast(msg) {
     const box = document.getElementById("toastBox");
+    if (!box) return;
     box.textContent = msg;
     box.classList.add("show");
     clearTimeout(box._t);

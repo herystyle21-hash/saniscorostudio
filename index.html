@@ -4,39 +4,101 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';" />
-  <title>Sanis Studio — Editor Konten Instagram</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Sanis Coro — Studio Konten Instagram</title>
+  <link rel="stylesheet" href="style.css?v=4" />
 </head>
 <body>
-  <!-- HALAMAN LOGIN -->
-  <section class="login-screen" id="loginScreen" aria-label="Halaman Login Sanis Studio">
-    <div class="login-card">
-      <div class="login-logo">SC</div>
-      <h1 class="login-title">SANIS STUDIO</h1>
-      <p class="login-sub">Studio Pembuat Carousel &amp; Microblog IG</p>
+  <!-- HALAMAN DEPAN (LANDING PAGE FUTURISTIK) -->
+  <div class="landing-page" id="loginScreen">
+    <!-- NAVIGASI ATAS -->
+    <header class="lp-navbar">
+      <a href="#home" class="lp-brand">
+        <span class="lp-brand-mark">SC</span>
+        <span class="lp-brand-sep"></span>
+        <span class="lp-brand-text"><strong>SANIS</strong> <em>CORO</em></span>
+      </a>
 
-      <form id="loginForm" class="login-form" autocomplete="off">
-        <div>
-          <label class="field-label" for="loginUser">Username</label>
-          <input type="text" id="loginUser" class="input" placeholder="Ketik username..." required />
+      <nav class="lp-menu" id="lpMenu" aria-label="Navigasi Utama">
+        <a href="#home" class="lp-link active">Home</a>
+        <a href="#about" class="lp-link">About</a>
+        <a href="#features" class="lp-link">Features</a>
+        <a href="#services" class="lp-link">Services</a>
+        <a href="#contact" class="lp-link">Contact</a>
+      </nav>
+
+      <div class="lp-nav-right">
+        <span class="lp-nav-divider"></span>
+        <button type="button" class="btn-login-futuristic" id="btnOpenLogin">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+          </svg>
+          <span>Login</span>
+          <span class="arrow">›</span>
+        </button>
+        <button type="button" class="lp-burger" id="btnToggleLpMenu" aria-label="Menu">☰</button>
+      </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <main class="lp-hero" id="home">
+      <div class="lp-hero-ring" aria-hidden="true"></div>
+
+      <div class="lp-hero-center">
+        <div class="lp-hero-logo">
+          <svg viewBox="0 0 220 120" width="210" height="115" aria-hidden="true">
+            <path d="M92 22 H48 A16 16 0 0 0 32 38 V44 A16 16 0 0 0 48 60 H76 A16 16 0 0 1 92 76 V82 A16 16 0 0 1 76 98 H28" fill="none" stroke="#09090b" stroke-width="14" stroke-linecap="butt"/>
+            <path d="M188 44 V22 H136 A24 24 0 0 0 112 46 V74 A24 24 0 0 0 136 98 H188 V76" fill="none" stroke="#09090b" stroke-width="14" stroke-linecap="butt"/>
+          </svg>
+          <div class="lp-hero-wordmark"><strong>SANIS</strong> <span>CORO</span></div>
+          <div class="lp-hero-submark">57 &nbsp;&nbsp; C R E A T O R &nbsp;&nbsp; 58</div>
         </div>
-        <div>
-          <label class="field-label" for="loginPass">Password / PIN</label>
-          <div class="pass-wrap">
-            <input type="password" id="loginPass" class="input" placeholder="Ketik PIN / password..." required />
-            <button type="button" class="toggle-pass" id="btnTogglePass" aria-label="Lihat Password">👁️</button>
+
+        <div class="lp-ornament" aria-hidden="true">
+          <span></span><i>///</i><span></span>
+        </div>
+
+        <p class="lp-tagline">Innovate Today &nbsp;•&nbsp; Inspire Tomorrow</p>
+
+        <div class="lp-hero-cta">
+          <button type="button" class="btn-explore-futuristic" id="btnHeroExplore">
+            <span>Explore More</span>
+            <span class="arrow">›</span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- MODAL POP-UP LOGIN -->
+    <div class="login-modal-backdrop hidden" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="modalLoginTitle">
+      <div class="login-card">
+        <button type="button" class="modal-close-btn" id="btnCloseLogin" aria-label="Tutup">✕</button>
+        <div class="login-logo">SC</div>
+        <h2 class="login-title" id="modalLoginTitle">SANIS STUDIO</h2>
+        <p class="login-sub">Masuk ke Workspace Microblog &amp; Carousel</p>
+
+        <form id="loginForm" class="login-form" autocomplete="off">
+          <div>
+            <label class="field-label" for="loginUser">Username</label>
+            <input type="text" id="loginUser" class="input" value="saniscoro" placeholder="Ketik username..." required />
           </div>
-        </div>
-        <div class="login-error" id="loginError" role="alert"></div>
-        <button type="submit" class="btn-primary login-submit">Masuk ke Studio →</button>
-      </form>
+          <div>
+            <label class="field-label" for="loginPass">Password / PIN</label>
+            <div class="pass-wrap">
+              <input type="password" id="loginPass" class="input" value="5758" placeholder="Ketik PIN / password..." required />
+              <button type="button" class="toggle-pass" id="btnTogglePass" aria-label="Lihat Password">👁️</button>
+            </div>
+          </div>
+          <div class="login-error" id="loginError" role="alert"></div>
+          <button type="submit" id="btnLoginSubmit" class="btn-primary login-submit">Masuk ke Studio →</button>
+        </form>
 
-      <div class="login-hint">
-        <span>Akun bawaan: <strong>saniscoro</strong> • PIN: <strong>5758</strong></span>
-        <button type="button" class="link-btn mt-6" id="btnQuickFill">Isi Otomatis Akun Bawaan</button>
+        <div class="login-hint">
+          <span>Akun bawaan: <strong>saniscoro</strong> • PIN: <strong>5758</strong></span>
+          <button type="button" class="link-btn mt-6" id="btnQuickFill">Reset &amp; Isi Akun Bawaan</button>
+        </div>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- APLIKASI UTAMA -->
   <div id="appShell" class="app-locked">
@@ -67,10 +129,8 @@
       <!-- AREA PRATINJAU KANVAS -->
       <section class="stage-panel active-mobile" id="mobilePreviewSection">
         <div class="stage-topbar">
-          <!-- Navigasi Slide Cepat -->
           <div class="quick-slides" id="quickSlidePills" aria-label="Pilih Slide Cepat"></div>
 
-          <!-- Pengaturan Ukuran & Kualitas -->
           <div class="hud-group">
             <button type="button" class="hud-btn" id="toggleRatioBtn" title="Ganti Rasio IG">4:5</button>
             <button type="button" class="hud-btn" id="toggleQualityBtn" title="Ganti Resolusi">HD 1440</button>
@@ -375,6 +435,6 @@
 
   <div class="toast" id="toastBox" role="status" aria-live="polite"></div>
 
-  <script src="app.js" defer></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

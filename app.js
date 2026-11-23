@@ -169,8 +169,8 @@
       const btnOpenLogin = document.getElementById("btnOpenLogin");
       if (btnOpenLogin) btnOpenLogin.onclick = openLogin;
 
-      const btnHeroExplore = document.getElementById("btnHeroExplore");
-      if (btnHeroExplore) btnHeroExplore.onclick = openLogin;
+      const btnAboutEnterStudio = document.getElementById("btnAboutEnterStudio");
+      if (btnAboutEnterStudio) btnAboutEnterStudio.onclick = openLogin;
 
       const btnCloseLogin = document.getElementById("btnCloseLogin");
       if (btnCloseLogin) btnCloseLogin.onclick = closeLogin;
@@ -194,6 +194,19 @@
           if (lpMenu) lpMenu.classList.remove("open");
         };
       });
+
+      const loginScreen = document.getElementById("loginScreen");
+      if (loginScreen) {
+        loginScreen.addEventListener("scroll", () => {
+          const aboutEl = document.getElementById("about");
+          if (!aboutEl) return;
+          const isPastHero = loginScreen.scrollTop > aboutEl.offsetTop - 220;
+          document.querySelectorAll(".lp-link").forEach(l => {
+            const href = l.getAttribute("href");
+            l.classList.toggle("active", isPastHero ? href === "#about" : href === "#home");
+          });
+        }, { passive: true });
+      }
 
       const loginForm = document.getElementById("loginForm");
       if (loginForm) loginForm.addEventListener("submit", handleLoginAttempt);

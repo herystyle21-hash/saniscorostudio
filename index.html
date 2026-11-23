@@ -5,37 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';" />
   <title>Sanis Coro — Studio Konten Instagram</title>
-  <link rel="stylesheet" href="style.css?v=4" />
+  <link rel="stylesheet" href="style.css?v=5" />
 </head>
 <body>
   <!-- HALAMAN DEPAN (LANDING PAGE FUTURISTIK) -->
   <div class="landing-page" id="loginScreen">
-    <!-- NAVIGASI ATAS -->
+    <!-- NAVIGASI ATAS FUTURISTIK (HUD GLASSMORPHISM) -->
     <header class="lp-navbar">
-      <a href="#home" class="lp-brand">
-        <span class="lp-brand-mark">SC</span>
-        <span class="lp-brand-sep"></span>
-        <span class="lp-brand-text"><strong>SANIS</strong> <em>CORO</em></span>
+      <a href="#home" class="lp-brand" aria-label="Sanis Coro Home">
+        <div class="lp-brand-hex">
+          <span>SC</span>
+        </div>
+        <div class="lp-brand-info">
+          <div class="lp-brand-text"><strong>SANIS</strong> <em>CORO</em></div>
+          <div class="lp-brand-code">SYS // 57-58</div>
+        </div>
       </a>
 
-      <nav class="lp-menu" id="lpMenu" aria-label="Navigasi Utama">
-        <a href="#home" class="lp-link active">Home</a>
-        <a href="#about" class="lp-link">About</a>
-        <a href="#features" class="lp-link">Features</a>
-        <a href="#services" class="lp-link">Services</a>
-        <a href="#contact" class="lp-link">Contact</a>
+      <nav class="lp-menu-capsule" id="lpMenu" aria-label="Navigasi Utama">
+        <a href="#home" class="lp-link active"><span class="nav-idx">01</span>Home</a>
+        <a href="#about" class="lp-link"><span class="nav-idx">02</span>About</a>
+        <a href="#features" class="lp-link"><span class="nav-idx">03</span>Features</a>
+        <a href="#services" class="lp-link"><span class="nav-idx">04</span>Services</a>
+        <a href="#contact" class="lp-link"><span class="nav-idx">05</span>Contact</a>
       </nav>
 
       <div class="lp-nav-right">
-        <span class="lp-nav-divider"></span>
+        <div class="lp-status-pill" title="Sistem Aktif">
+          <span class="pulse-dot"></span>
+          <span>ONLINE</span>
+        </div>
         <button type="button" class="btn-login-futuristic" id="btnOpenLogin">
+          <span class="btn-glow-sweep" aria-hidden="true"></span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
           </svg>
-          <span>Login</span>
-          <span class="arrow">›</span>
+          <span>LOGIN</span>
+          <span class="arrow">»</span>
         </button>
-        <button type="button" class="lp-burger" id="btnToggleLpMenu" aria-label="Menu">☰</button>
+        <button type="button" class="lp-burger" id="btnToggleLpMenu" aria-label="Buka Menu">☰</button>
       </div>
     </header>
 
@@ -435,6 +443,6 @@
 
   <div class="toast" id="toastBox" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

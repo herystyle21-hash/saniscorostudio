@@ -7,10 +7,7 @@
   const SAFE_MIME = /^data:image\/(png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=]+$/i;
   const imgCache = new Map();
 
-  const DEFAULT_STATE = {
-    template: "breaking",
-    themeMode: "dark",
-    accentColor: "#E11D2A",
+  const 
     ratio: "4:5",
     exportWidth: 1440,
     logoMode: "sc_vector",

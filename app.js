@@ -11,11 +11,19 @@
   const DEFAULT_PASS = "5758";
 
   const FONT_STACKS = {
-    sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    serif: 'Georgia, "Times New Roman", Times, serif',
-    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-    impact: 'Impact, "Arial Black", "Segoe UI", sans-serif',
-    rounded: '"Trebuchet MS", Verdana, "Segoe UI", sans-serif'
+    sans: '"Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    serif: '"Playfair Display", Georgia, "Times New Roman", serif',
+    mono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace',
+    impact: '"Anton", Impact, "Arial Black", sans-serif',
+    rounded: '"Fredoka", "Trebuchet MS", Verdana, sans-serif'
+  };
+
+  const FONT_WEIGHTS = {
+    sans: { title: "800", body: "600" },
+    serif: { title: "900", body: "700" },
+    mono: { title: "800", body: "600" },
+    impact: { title: "400", body: "600" },
+    rounded: { title: "700", body: "600" }
   };
 
   const DEFAULT_STATE = {
@@ -101,6 +109,14 @@
 
     function getActiveFont() {
       return FONT_STACKS[state.fontFamily] || FONT_STACKS.sans;
+    }
+
+    function getTitleWeight() {
+      return (FONT_WEIGHTS[state.fontFamily] || FONT_WEIGHTS.sans).title;
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => requestRender());
     }
 
     /* --- SISTEM LOGIN, SCROLL-REVEAL & LANDING PAGE --- */
@@ -538,9 +554,9 @@
       c.stroke();
 
       c.textAlign = "center";
-      c.font = "900 22px -apple-system, BlinkMacSystemFont, sans-serif";
+      c.font = '800 22px "Plus Jakarta Sans", sans-serif';
       c.fillText("SANIS CORO", 0, 62);
-      c.font = "700 11px -apple-system, BlinkMacSystemFont, sans-serif";
+      c.font = '700 11px "Plus Jakarta Sans", sans-serif';
       c.fillText("57   C R E A T O R   58", 0, 80);
       c.restore();
     }
@@ -558,7 +574,7 @@
       }
       if (state.logoMode === "monogram") {
         c.save();
-        c.font = `900 44px ${getActiveFont()}`;
+        c.font = `${getTitleWeight()} 44px ${getActiveFont()}`;
         c.fillStyle = fg;
         c.textAlign = "center";
         c.textBaseline = "middle";
@@ -594,7 +610,7 @@
       });
 
       const activeFont = getActiveFont();
-      const weight = state.fontFamily === "impact" ? "400" : "900";
+      const weight = getTitleWeight();
       c.font = `${weight} ${fontSize}px ${activeFont}`;
       const lines = [];
       let current = [];
@@ -1203,10 +1219,17 @@
 
       /* --- EVENT TYPOGRAPHY --- */
       document.querySelectorAll(".typo-card").forEach(card => {
-        card.onclick = () => {
+        card.onclick = async () => {
           state.fontFamily = card.dataset.font;
           syncFormFromState();
           scheduleSave();
+          if (document.fonts && document.fonts.load) {
+            try {
+              await document.fonts.load(`700 48px ${getActiveFont()}`);
+              requestRender();
+            } catch (_) {}
+          }
+          showToast(`Font diubah: ${card.querySelector(".typo-name").textContent}`);
         };
       });
 

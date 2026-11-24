@@ -10,10 +10,21 @@
   const DEFAULT_USER = "saniscoro";
   const DEFAULT_PASS = "5758";
 
+  const FONT_STACKS = {
+    sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    serif: 'Georgia, "Times New Roman", Times, serif',
+    mono: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+    impact: 'Impact, "Arial Black", "Segoe UI", sans-serif',
+    rounded: '"Trebuchet MS", Verdana, "Segoe UI", sans-serif'
+  };
+
   const DEFAULT_STATE = {
     template: "breaking",
     themeMode: "dark",
     accentColor: "#E11D2A",
+    fontFamily: "sans",
+    titleScale: 100,
+    lineHeightScale: 112,
     ratio: "4:5",
     exportWidth: 1440,
     logoMode: "sc_vector",
@@ -87,6 +98,10 @@
     const ctx = canvas.getContext("2d");
     let rafPending = false;
     let saveTimer = null;
+
+    function getActiveFont() {
+      return FONT_STACKS[state.fontFamily] || FONT_STACKS.sans;
+    }
 
     /* --- SISTEM LOGIN, SCROLL-REVEAL & LANDING PAGE --- */
     function hashText(str) {
@@ -233,7 +248,6 @@
         btnToggleLpMenu.onclick = () => lpMenu.classList.toggle("open");
       }
 
-      // Navigasi halus saat klik tautan menu & Explore
       document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener("click", e => {
           const href = anchor.getAttribute("href");
@@ -245,7 +259,6 @@
         });
       });
 
-      // Scroll-Spy ringan menggunakan rAF throttle
       const sectionIds = ["home", "about", "features", "services", "contact"];
       const sectionEls = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
       const navLinks = Array.from(document.querySelectorAll(".lp-link"));
@@ -362,6 +375,7 @@
           if (!isSafeDataUrl(base.customLogo)) base.customLogo = "";
           if (!base.slides.length) base.slides = JSON.parse(JSON.stringify(DEFAULT_STATE.slides));
           base.activeSlide = Math.max(0, Math.min(base.activeSlide, base.slides.length - 1));
+          if (!FONT_STACKS[base.fontFamily]) base.fontFamily = "sans";
         }
       } catch (_) {}
       return base;
@@ -544,7 +558,7 @@
       }
       if (state.logoMode === "monogram") {
         c.save();
-        c.font = "900 44px -apple-system, BlinkMacSystemFont, sans-serif";
+        c.font = `900 44px ${getActiveFont()}`;
         c.fillStyle = fg;
         c.textAlign = "center";
         c.textBaseline = "middle";
@@ -579,7 +593,9 @@
         tok.text.split(/\s+/).filter(Boolean).forEach(w => words.push({ word: w, hi: tok.hi }));
       });
 
-      c.font = `900 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+      const activeFont = getActiveFont();
+      const weight = state.fontFamily === "impact" ? "400" : "900";
+      c.font = `${weight} ${fontSize}px ${activeFont}`;
       const lines = [];
       let current = [];
       let currentWidth = 0;
@@ -642,6 +658,10 @@
       const isFresh = state.themeMode === "fresh";
       const bgBase = isFresh ? "#ffffff" : "#000000";
       const fgBase = isFresh ? "#09090b" : "#ffffff";
+      const activeFont = getActiveFont();
+      const bodyFont = state.fontFamily === "impact" ? FONT_STACKS.sans : activeFont;
+      const tScale = (state.titleScale || 100) / 100;
+      const lhFactor = (state.lineHeightScale || 112) / 100;
 
       c.save();
       c.imageSmoothingEnabled = true;
@@ -681,7 +701,7 @@
       roundRect(c, w - 136, 44, 88, 42, 21);
       c.fill();
       c.fillStyle = fgBase;
-      c.font = "800 20px -apple-system, sans-serif";
+      c.font = `800 20px ${bodyFont}`;
       c.textAlign = "center";
       c.textBaseline = "middle";
       c.fillText(`${index + 1}/${state.slides.length}`, w - 92, 65);
@@ -689,18 +709,20 @@
       if (slide.type === "cover" && state.template === "breaking") {
         drawBrandHeader(c, w / 2, h * 0.56, isFresh);
         const titleY = h * 0.625;
-        const fontSize = state.ratio === "4:5" ? 66 : 56;
-        drawHighlightedHeadline(c, slide.title, w / 2, titleY, w - 110, fontSize, fontSize * 1.12, fgBase, state.accentColor, "center");
+        const baseSize = state.ratio === "4:5" ? 66 : 56;
+        const fontSize = Math.round(baseSize * tScale);
+        drawHighlightedHeadline(c, slide.title, w / 2, titleY, w - 110, fontSize, fontSize * lhFactor, fgBase, state.accentColor, "center");
       } else if (state.template === "editorial" && slide.type === "cover") {
         c.fillStyle = isFresh ? "rgba(255,255,255,0.92)" : "rgba(18,18,21,0.92)";
         c.fillRect(0, h * 0.44, w, h * 0.56);
         drawBrandHeader(c, 150, 74, isFresh);
         c.fillStyle = state.accentColor;
-        c.font = "800 20px -apple-system, sans-serif";
+        c.font = `800 20px ${bodyFont}`;
         c.textAlign = "left";
         c.fillText((slide.kicker || "EDITORIAL").toUpperCase(), 64, h * 0.47);
-        const usedH = drawHighlightedHeadline(c, slide.title, 64, h * 0.505, w - 128, 56, 63, fgBase, state.accentColor, "left");
-        wrapSimpleText(c, slide.subtitle, 64, h * 0.505 + usedH + 16, w - 128, 36, isFresh ? "#3f3f46" : "#a1a1aa", "500 25px -apple-system, sans-serif");
+        const fontSize = Math.round(56 * tScale);
+        const usedH = drawHighlightedHeadline(c, slide.title, 64, h * 0.505, w - 128, fontSize, fontSize * lhFactor, fgBase, state.accentColor, "left");
+        wrapSimpleText(c, slide.subtitle, 64, h * 0.505 + usedH + 16, w - 128, 36, isFresh ? "#3f3f46" : "#a1a1aa", `500 25px ${bodyFont}`);
       } else {
         drawBrandHeader(c, 150, 72, isFresh);
         const cardY = h * 0.24;
@@ -713,15 +735,16 @@
         c.stroke();
 
         c.fillStyle = state.accentColor;
-        c.font = "800 21px -apple-system, sans-serif";
+        c.font = `800 21px ${bodyFont}`;
         c.textAlign = "left";
         c.fillText((slide.kicker || "INSIGHT").toUpperCase(), 96, cardY + 54);
 
-        const usedH = drawHighlightedHeadline(c, slide.title, 96, cardY + 90, w - 192, 46, 54, fgBase, state.accentColor, "left");
+        const fontSize = Math.round(46 * tScale);
+        const usedH = drawHighlightedHeadline(c, slide.title, 96, cardY + 90, w - 192, fontSize, fontSize * lhFactor, fgBase, state.accentColor, "left");
         let cursorY = cardY + 90 + usedH + 18;
 
         if (slide.subtitle) {
-          cursorY += wrapSimpleText(c, slide.subtitle, 96, cursorY, w - 192, 34, isFresh ? "#3f3f46" : "#d4d4d8", "500 24px -apple-system, sans-serif") + 18;
+          cursorY += wrapSimpleText(c, slide.subtitle, 96, cursorY, w - 192, 34, isFresh ? "#3f3f46" : "#d4d4d8", `500 24px ${bodyFont}`) + 18;
         }
 
         (slide.bullets || []).forEach(b => {
@@ -731,7 +754,7 @@
           c.arc(106, cursorY + 15, 7, 0, Math.PI * 2);
           c.fill();
           const clean = b.replace(/\*\*/g, "");
-          cursorY += wrapSimpleText(c, clean, 128, cursorY, w - 224, 34, fgBase, "700 24px -apple-system, sans-serif") + 14;
+          cursorY += wrapSimpleText(c, clean, 128, cursorY, w - 224, 34, fgBase, `700 24px ${bodyFont}`) + 14;
         });
 
         if (slide.quote) {
@@ -739,7 +762,7 @@
           roundRect(c, 96, cardY + cardH - 104, w - 192, 66, 14);
           c.fill();
           c.fillStyle = isFresh ? "#52525b" : "#a1a1aa";
-          c.font = "600 20px -apple-system, sans-serif";
+          c.font = `600 20px ${bodyFont}`;
           c.textAlign = "left";
           c.textBaseline = "middle";
           c.fillText(slide.quote.slice(0, 64), 118, cardY + cardH - 71);
@@ -748,7 +771,7 @@
 
       const handleTxt = (state.socialHandle || "Tiktok & IG | @saniscoro").trim();
       if (handleTxt) {
-        c.font = "600 20px -apple-system, sans-serif";
+        c.font = `600 20px ${bodyFont}`;
         const pillW = Math.min(w - 112, c.measureText(handleTxt).width + 48);
         const pillX = w - 56 - pillW;
         const pillY = h - 88;
@@ -921,6 +944,15 @@
       document.getElementById("toggleQualityBtn").textContent = `HD ${state.exportWidth}`;
 
       document.querySelectorAll(".tpl-card").forEach(b => b.classList.toggle("active", b.dataset.tpl === state.template));
+      document.querySelectorAll(".typo-card").forEach(b => b.classList.toggle("active", b.dataset.font === state.fontFamily));
+
+      const tScale = state.titleScale || 100;
+      const lhScale = state.lineHeightScale || 112;
+      document.getElementById("titleScale").value = tScale;
+      document.getElementById("valTitleScale").textContent = `${tScale}%`;
+      document.getElementById("lineHeightScale").value = lhScale;
+      document.getElementById("valLineHeight").textContent = `${(lhScale / 100).toFixed(2)}x`;
+
       document.getElementById("themeMode").value = state.themeMode;
       document.getElementById("accentColor").value = state.accentColor;
       document.getElementById("logoMode").value = state.logoMode;
@@ -1168,6 +1200,41 @@
       document.querySelectorAll(".tpl-card").forEach(card => {
         card.onclick = () => { state.template = card.dataset.tpl; syncFormFromState(); scheduleSave(); };
       });
+
+      /* --- EVENT TYPOGRAPHY --- */
+      document.querySelectorAll(".typo-card").forEach(card => {
+        card.onclick = () => {
+          state.fontFamily = card.dataset.font;
+          syncFormFromState();
+          scheduleSave();
+        };
+      });
+
+      document.getElementById("titleScale").oninput = e => {
+        const v = Number(e.target.value);
+        state.titleScale = v;
+        document.getElementById("valTitleScale").textContent = `${v}%`;
+        requestRender();
+        scheduleSave();
+      };
+
+      document.getElementById("lineHeightScale").oninput = e => {
+        const v = Number(e.target.value);
+        state.lineHeightScale = v;
+        document.getElementById("valLineHeight").textContent = `${(v / 100).toFixed(2)}x`;
+        requestRender();
+        scheduleSave();
+      };
+
+      document.getElementById("btnResetTypo").onclick = () => {
+        state.fontFamily = "sans";
+        state.titleScale = 100;
+        state.lineHeightScale = 112;
+        syncFormFromState();
+        scheduleSave();
+        showToast("Tipografi dikembalikan ke standar");
+      };
+
       document.getElementById("themeMode").onchange = e => { state.themeMode = e.target.value; requestRender(); scheduleSave(); };
       document.getElementById("accentColor").oninput = e => { state.accentColor = e.target.value; requestRender(); scheduleSave(); };
       document.querySelectorAll(".chip-btn").forEach(ch => {

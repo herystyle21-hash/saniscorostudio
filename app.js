@@ -148,21 +148,44 @@
     }
 
     function initScrollReveal() {
-      const targets = document.querySelectorAll(".reveal-on-scroll");
-      if (!("IntersectionObserver" in window)) {
-        targets.forEach(el => el.classList.add("is-visible"));
-        return;
-      }
-      const io = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { rootMargin: "0px 0px -60px 0px", threshold: 0.1 });
+      const targets = Array.from(document.querySelectorAll(".reveal-on-scroll"));
+      if (!targets.length) return;
 
-      targets.forEach(el => io.observe(el));
+      const revealEl = el => {
+        if (!el.classList.contains("is-visible")) {
+          el.classList.add("is-visible");
+        }
+      };
+
+      const checkViewport = () => {
+        const triggerBottom = window.innerHeight + 60;
+        for (let i = targets.length - 1; i >= 0; i--) {
+          const el = targets[i];
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= triggerBottom) {
+            revealEl(el);
+            targets.splice(i, 1);
+          }
+        }
+      };
+
+      if ("IntersectionObserver" in window) {
+        const io = new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              revealEl(entry.target);
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { rootMargin: "0px 0px 80px 0px", threshold: 0.02 });
+
+        targets.forEach(el => io.observe(el));
+      }
+
+      window.addEventListener("scroll", checkViewport, { passive: true });
+      window.addEventListener("resize", checkViewport, { passive: true });
+      requestAnimationFrame(checkViewport);
+      setTimeout(checkViewport, 300);
     }
 
     function initAuth() {

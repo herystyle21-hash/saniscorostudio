@@ -172,6 +172,9 @@
       const btnAboutEnterStudio = document.getElementById("btnAboutEnterStudio");
       if (btnAboutEnterStudio) btnAboutEnterStudio.onclick = openLogin;
 
+      const btnContactOpenStudio = document.getElementById("btnContactOpenStudio");
+      if (btnContactOpenStudio) btnContactOpenStudio.onclick = openLogin;
+
       const btnCloseLogin = document.getElementById("btnCloseLogin");
       if (btnCloseLogin) btnCloseLogin.onclick = closeLogin;
 
@@ -196,16 +199,39 @@
       });
 
       const loginScreen = document.getElementById("loginScreen");
+      const sectionIds = ["home", "about", "features", "services", "contact"];
       if (loginScreen) {
         loginScreen.addEventListener("scroll", () => {
-          const aboutEl = document.getElementById("about");
-          if (!aboutEl) return;
-          const isPastHero = loginScreen.scrollTop > aboutEl.offsetTop - 220;
+          const scrollPos = loginScreen.scrollTop + 220;
+          let activeId = "home";
+          for (const id of sectionIds) {
+            const el = document.getElementById(id);
+            if (el && scrollPos >= el.offsetTop) {
+              activeId = id;
+            }
+          }
           document.querySelectorAll(".lp-link").forEach(l => {
-            const href = l.getAttribute("href");
-            l.classList.toggle("active", isPastHero ? href === "#about" : href === "#home");
+            l.classList.toggle("active", l.getAttribute("href") === `#${activeId}`);
           });
         }, { passive: true });
+      }
+
+      const lpContactForm = document.getElementById("lpContactForm");
+      if (lpContactForm) {
+        lpContactForm.addEventListener("submit", async e => {
+          e.preventDefault();
+          const name = document.getElementById("contactName").value.trim();
+          const topic = document.getElementById("contactTopic").value;
+          const msg = document.getElementById("contactMessage").value.trim();
+          const formatted = `Halo Sanis Coro (@saniscoro),\nNama: ${name}\nTopik: ${topic}\nPesan: ${msg}`;
+          try {
+            await navigator.clipboard.writeText(formatted);
+            showToast("Pesan disalin! Siap ditempel ke DM @saniscoro.");
+          } catch (_) {
+            showToast("Pesan siap dikirim ke @saniscoro!");
+          }
+          lpContactForm.reset();
+        });
       }
 
       const loginForm = document.getElementById("loginForm");
@@ -868,7 +894,7 @@
         dragBadge.classList.add("visible");
       } else {
         thumb.style.display = "none";
-        ph.style.display = "block";
+        ph.style.display = "flex";
         dragBadge.classList.remove("visible");
       }
 
@@ -947,7 +973,7 @@
         const del = document.createElement("button");
         del.type = "button";
         del.className = "mini-icon-btn";
-        del.textContent = "🗑";
+        del.textContent = "×";
         del.title = "Hapus slide";
         del.onclick = () => {
           if (state.slides.length <= 1) return showToast("Minimal harus ada 1 slide");

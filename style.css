@@ -454,13 +454,11 @@ body {
   color: #ffffff;
 }
 
-/* 02–05. MODULAR LANDING SECTIONS (LAZY PAINT OPTIMIZED) */
+/* 02–05. MODULAR LANDING SECTIONS */
 .lp-section {
   padding: 68px 24px 76px;
   position: relative;
   z-index: 2;
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 640px;
 }
 
 .lp-container {

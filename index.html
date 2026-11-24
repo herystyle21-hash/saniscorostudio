@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';" />
   <title>Sanis Coro — Studio Konten Instagram</title>
-  <link rel="stylesheet" href="style.css?v=13" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Fredoka:wght@600;700&family=JetBrains+Mono:wght@600;800&family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=14" />
 </head>
 <body>
   <!-- LAPISAN LATAR TETAP RINGAN (GPU COMPOSITED) -->
@@ -795,24 +798,24 @@
 
             <div class="typo-grid" id="fontSelector">
               <button type="button" class="typo-card active" data-font="sans">
-                <span class="typo-preview" style="font-family:-apple-system,BlinkMacSystemFont,sans-serif">Aa</span>
+                <span class="typo-preview" style="font-family:'Plus Jakarta Sans',sans-serif">Aa</span>
                 <span class="typo-name">Modern Sans</span>
               </button>
               <button type="button" class="typo-card" data-font="serif">
-                <span class="typo-preview" style="font-family:Georgia,'Times New Roman',serif">Aa</span>
+                <span class="typo-preview" style="font-family:'Playfair Display',Georgia,serif">Aa</span>
                 <span class="typo-name">Editorial Serif</span>
               </button>
               <button type="button" class="typo-card" data-font="mono">
-                <span class="typo-preview" style="font-family:ui-monospace,Menlo,monospace">Aa</span>
+                <span class="typo-preview" style="font-family:'JetBrains Mono',monospace">Aa</span>
                 <span class="typo-name">Cyber Mono</span>
               </button>
               <button type="button" class="typo-card" data-font="impact">
-                <span class="typo-preview" style="font-family:Impact,'Arial Black',sans-serif">Aa</span>
+                <span class="typo-preview" style="font-family:'Anton',sans-serif;letter-spacing:0.5px">Aa</span>
                 <span class="typo-name">Display Impact</span>
               </button>
               <button type="button" class="typo-card" data-font="rounded">
-                <span class="typo-preview" style="font-family:'Trebuchet MS',Verdana,sans-serif">Aa</span>
-                <span class="typo-name">Clean Geometric</span>
+                <span class="typo-preview" style="font-family:'Fredoka',sans-serif">Aa</span>
+                <span class="typo-name">Clean Rounded</span>
               </button>
             </div>
 
@@ -990,6 +993,6 @@
 
   <div class="toast" id="toastBox" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>

@@ -88,7 +88,7 @@
     let rafPending = false;
     let saveTimer = null;
 
-    /* --- SISTEM LOGIN & LANDING PAGE --- */
+    /* --- SISTEM LOGIN, SCROLL-REVEAL & LANDING PAGE --- */
     function hashText(str) {
       let h = 2166136261;
       for (let i = 0; i < str.length; i++) {
@@ -147,7 +147,27 @@
       }
     }
 
+    function initScrollReveal() {
+      const targets = document.querySelectorAll(".reveal-on-scroll");
+      if (!("IntersectionObserver" in window)) {
+        targets.forEach(el => el.classList.add("is-visible"));
+        return;
+      }
+      const io = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: "0px 0px -60px 0px", threshold: 0.1 });
+
+      targets.forEach(el => io.observe(el));
+    }
+
     function initAuth() {
+      initScrollReveal();
+
       const creds = getAuthCreds();
       const newAuthUserInput = document.getElementById("newAuthUser");
       if (newAuthUserInput) newAuthUserInput.value = creds.user;
@@ -190,31 +210,39 @@
         btnToggleLpMenu.onclick = () => lpMenu.classList.toggle("open");
       }
 
-      document.querySelectorAll(".lp-link").forEach(link => {
-        link.onclick = () => {
-          document.querySelectorAll(".lp-link").forEach(l => l.classList.remove("active"));
-          link.classList.add("active");
+      // Navigasi halus saat klik tautan menu & Explore
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", e => {
+          const href = anchor.getAttribute("href");
+          const targetEl = href && href.length > 1 ? document.querySelector(href) : null;
+          if (!targetEl) return;
+          e.preventDefault();
           if (lpMenu) lpMenu.classList.remove("open");
-        };
+          targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
       });
 
-      const loginScreen = document.getElementById("loginScreen");
+      // Scroll-Spy ringan menggunakan rAF throttle
       const sectionIds = ["home", "about", "features", "services", "contact"];
-      if (loginScreen) {
-        loginScreen.addEventListener("scroll", () => {
-          const scrollPos = loginScreen.scrollTop + 220;
+      const sectionEls = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+      const navLinks = Array.from(document.querySelectorAll(".lp-link"));
+      let scrollTicking = false;
+
+      window.addEventListener("scroll", () => {
+        if (scrollTicking || document.getElementById("loginScreen").classList.contains("hidden")) return;
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+          const pos = window.scrollY + 200;
           let activeId = "home";
-          for (const id of sectionIds) {
-            const el = document.getElementById(id);
-            if (el && scrollPos >= el.offsetTop) {
-              activeId = id;
-            }
+          for (const el of sectionEls) {
+            if (pos >= el.offsetTop) activeId = el.id;
           }
-          document.querySelectorAll(".lp-link").forEach(l => {
+          navLinks.forEach(l => {
             l.classList.toggle("active", l.getAttribute("href") === `#${activeId}`);
           });
-        }, { passive: true });
-      }
+          scrollTicking = false;
+        });
+      }, { passive: true });
 
       const lpContactForm = document.getElementById("lpContactForm");
       if (lpContactForm) {

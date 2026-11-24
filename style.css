@@ -459,9 +459,9 @@ body {
   box-shadow: 0 0 20px rgba(56, 189, 248, 0.65);
 }
 
-/* 02. ABOUT SECTION & MODULAR LANDING SECTIONS */
+/* 02–05. MODULAR LANDING SECTIONS */
 .lp-section {
-  padding: 72px 24px 96px;
+  padding: 72px 24px 80px;
   position: relative;
   z-index: 2;
 }
@@ -510,7 +510,9 @@ body {
   margin-top: 12px;
 }
 
-.lp-about-grid {
+.lp-about-grid,
+.lp-features-grid,
+.lp-services-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
@@ -563,6 +565,34 @@ body {
   color: #475569;
 }
 
+.service-list {
+  list-style: none;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(56, 189, 248, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.service-list li {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.service-list li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #0284c7;
+  flex-shrink: 0;
+}
+
 .hud-metrics-bar {
   margin-top: 22px;
   background: rgba(255, 255, 255, 0.82);
@@ -603,6 +633,83 @@ body {
   width: 1px;
   height: 34px;
   background: rgba(56, 189, 248, 0.35);
+}
+
+/* 05. Contact Grid & Footer */
+.lp-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.contact-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact-info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 20px;
+}
+
+.contact-info-card h4 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #09090b;
+  margin: 3px 0 4px;
+}
+
+.contact-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lp-footer {
+  margin-top: 24px;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(56, 189, 248, 0.38);
+}
+
+.lp-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.lp-footer-brand {
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #09090b;
+}
+
+.lp-footer-brand span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0284c7;
+  margin-left: 6px;
+}
+
+.lp-footer-copy {
+  font-size: 12.5px;
+  color: #475569;
+}
+
+.lp-back-top {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0284c7;
+  text-decoration: none;
 }
 
 /* Modal Pop-up Login (Glassmorphism Terang) */
@@ -1464,7 +1571,11 @@ input[type="range"] {
   .lp-status-pill {
     display: none;
   }
-  .lp-about-grid {
+  .lp-about-grid,
+  .lp-features-grid,
+  .lp-services-grid,
+  .lp-contact-grid,
+  .row-2 {
     grid-template-columns: 1fr;
   }
   .hud-metric-div {
